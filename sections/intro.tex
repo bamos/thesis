@@ -1,0 +1,227 @@
+\chapter{Introduction}
+The field of machine learning has grown rapidly over the past few
+years and has a growing set of well-defined and
+well-understood operations and paradigms that allow
+a practitioner to inject domain
+knowledge into the modeling procedure.
+These operations include linear maps, convolutions,
+activation functions, random sampling, and
+simple projections (e.g.~onto the simplex or Birkhoff polytope).
+In addition to these layers, the practitioner can also
+inject domain knowledge at a higher-level of
+how modeling components interact.
+Paradigms are becoming well-established for modeling
+images, videos, audio, sequences, permutations, and graphs,
+among others.
+This thesis proposes a new set of primitive operations and
+paradigms based on optimization that allow the practitioner
+to inject specialized domain knowledge into the modeling procedure.
+
+Optimization plays a large role in machine learning for
+parameter optimization or architecture search.
+In this thesis, we argue that optimization should have a third
+role in machine learning separate from these two,
+that it can be used as a modeling tool inside of
+the inference procedure.
+Optimization is a powerful modeling tool and as we show in
+\cref{sec:bg:existing}, many of the standard operations such
+as the ReLU, sigmoid, and softmax can all be interpreted
+as explicit closed-form solutions to constrained convex
+optimization problems.
+We also highlight in \cref{sec:bg:ff-energy} that the standard
+feedforward supervised learning setup can be captured
+by an energy-based optimization problem.
+Thus these techniques are captured as special cases of the
+general optimization-based modeling methods we study in
+this thesis that don't necessarily have explicit
+closed-form solutions.
+This generalization adds new modeling capabilities that
+were not possible before and enables new ways that
+practitioners can inject domain knowledge into the models.
+
+From an optimization viewpoint, the techniques we propose
+in this thesis can be used for partial modeling of
+optimization problems.
+Traditionally a modeler needs to have a complete analytic view
+of their system if they want to use optimization to solve
+their problem, such as in many control, planning, and scheduling tasks.
+The techniques in this thesis lets the practitioner
+leave latent parts in their optimization-based modeling
+procedure that can then be learned from data.
+
+\section{Summary of research contributions}
+The first portion of this thesis presents foundational
+modeling techniques that use optimization-based modeling:
+\begin{itemize}
+\item \cref{sec:optnet} presents the \emph{OptNet} architecture
+  that shows how to use constrained convex optimization
+  as a layer in an end-to-end architecture.
+  \begin{itemize}
+  \item \cref{sec:optnet:formulation} presents the
+    formulation of these architectures and shows how
+    backpropagation can be done in them by
+    implicitly differentiating the KKT conditions.
+  \item \cref{sec:optnet:rep-power} studies the
+    representational power of these architectures and proves
+    how they can represent any piecewise linear function
+    including the ReLU.
+  \item \cref{sec:optnet:qp-solver} presents our
+    efficient QP solver for these layers and
+    \cref{sec:optnet:qp-solver-grads}
+    shows how we can compute the backwards pass with
+    almost no computational overhead.
+  \item \cref{sec:icnn:exp} shows empirical results
+    that uses OptNet for a synthetic denoising task
+    and to learn the rules of the Sudoku game.
+  \end{itemize}
+\item \cref{sec:icnn} presents the \emph{input-convex neural
+  network} architecture.
+  \begin{itemize}
+  \item \cref{sec:icnn:inf} discusses efficient inference
+    techniques for these architectures.
+    We propose a new inference technique called the Bundle-Entropy
+    method in \cref{sec:icnn:inf:be}.
+  \item \cref{sec:icnn:learning} discusses efficient
+    learning techniques for these architecture.
+  \item \cref{sec:icnn:exps} shows empirical results applying
+    ICNNs to structured prediction, data imputation, and
+    continuous-action Q learning.
+  \end{itemize}
+\end{itemize}
+
+\vspace{4mm}
+The remaining portions discuss applications and
+extensions of OptNet.
+\begin{itemize}
+\item \cref{sec:empc} presents our
+  \emph{differentiable model predictive control} (MPC) work
+  as a step towards leveraging MPC as a differentiable
+  policy class for reinforcement learning in continuous
+  state-action spaces.
+  \begin{itemize}
+  \item \cref{sec:empc:diff-lqr} shows how to efficiently
+    differentiate through the Linear Quadratic Regulator (LQR)
+    by solving another LQR problem.
+    This result comes from implicitly differentiating the KKT
+    conditions of LQR and interpreting the resulting system
+    as solving another LQR problem.
+  \item \cref{sec:empc:diff-mpc} shows how to differentiate
+    through non-convex MPC problems by differentiating through the
+    fixed point obtained when solving the MPC problem with
+    sequential quadratic programming (SQP).
+  \item \cref{sec:empc:exps} shows our empirical results
+    using imitation learning in the pendulum and cartpole
+    environments.
+    Notably, we show why doing end-to-end learning with
+    a controller is important in tasks when the expert
+    is non-realizable.
+  \end{itemize}
+\item \cref{sec:lml} presents the Limited Multi-Layer Projection
+  (LML) layer for top-$k$ learning problems.
+  \begin{itemize}
+  \item \cref{sec:lml:lml} introduces the LML projection problem
+    that we study.
+  \item \cref{sec:lml:lml:efficient} shows how to efficiently
+    solve the LML projection problem by solving the dual
+    with a parallel bracketed root-finding method.
+  \item \cref{sec:lml:topk} presents how to maximize
+    the top-$k$ recall with the LML layer.
+  \item \cref{sec:lml:ex} shows our empirical results on
+    top-$k$ image classification and scene graph generation.
+  \end{itemize}
+\item \cref{sec:cvxpyth} shows how to make differentiable
+  \cvxpy optimization layers by differentiating through
+  the internal transformations and internal cone program solver.
+  This enables rapid prototyping of all of the convex
+  optimization-based modeling methods we consider in this thesis.
+  \begin{itemize}
+  \item \cref{sec:cvxpyth:diff-cp} shows how to differentiate
+    cone programs (including non-polyhedral cone programs)
+    by implicitly differentiating the residual map of
+    Minty's parameterization of the homogeneous
+    self-dual embedding.
+  \item \cref{sec:cvxpyth:examples} shows how OptNet and
+    other sample optimization layers can be easily implemented.
+  \end{itemize}
+\end{itemize}
+
+\section{Summary of open source contributions}
+The code and experiments developed for this thesis
+are free and open-source:
+
+\begin{itemize}
+\item \url{https://github.com/locuslab/icnn}:
+  TensorFlow experiments for the input-convex neural networks
+  work presented in \cref{sec:icnn}.
+\item \url{https://locuslab.github.io/qpth/} and
+  \url{https://github.com/locuslab/qpth}:
+  A stand-alone PyTorch library for the OptNet QP layers presented
+  in \cref{sec:optnet}.
+\item \url{https://github.com/locuslab/optnet}:
+  PyTorch experiments for the OptNet work
+  presented in \cref{sec:optnet}.
+\item \url{https://locuslab.github.io/mpc.pytorch}
+  and \url{https://github.com/locuslab/mpc.pytorch}:
+  A stand-alone PyTorch library for the differentiable
+  model predictive control approach presented in
+  \cref{sec:empc}.
+\item \url{https://github.com/locuslab/differentiable-mpc}:
+  PyTorch experiments for the differentiable MPC work
+  presented in \cref{sec:empc}.
+\end{itemize}
+
+\newpage
+\section{Summary of publications}
+\newcommand{\fcite}[1]{
+  \begin{leftbar}
+  \begin{quote}%
+    \citep{#1} \fullcite{#1}
+  \end{quote}
+  \end{leftbar}}
+
+\noindent The content of \cref{sec:optnet} appears in:
+\fcite{amos2017optnet}
+\vspace{5mm}
+
+\noindent The content of \cref{sec:icnn} appears in:
+\fcite{amos2017input}
+\vspace{5mm}
+
+\noindent The content of \cref{sec:empc} appears in:
+\fcite{amos2018differentiable}
+\vspace{5mm}
+
+\noindent
+\textbf{Non-thesis research:}
+I have contributed to the following research
+publications during my Ph.D. studies.
+These are excluded from the remainder of this thesis.
+
+\begin{leftbar}
+\begin{quote}%
+  \fullcite{amos2018learning} \\[5mm]
+  \fullcite{amos2016openface} \\
+  \textbf{Available online at:}
+  \url{https://cmusatyalab.github.io/openface} \\
+  \hrule~\\[5mm]
+  \emph{Non-Primary Publications:} \\[5mm]
+  \fullcite{donti2017task} \\[5mm]
+  \fullcite{zhao2016collapsed} \\[5mm]
+  \fullcite{chen2017empirical} \\[5mm]
+  \fullcite{chen2015early} \\[5mm]
+  \fullcite{davies2016privacy} \\[5mm]
+  \fullcite{wang2017scalable} \\[5mm]
+  \fullcite{hu2014case} \\[5mm]
+  \fullcite{satyanarayanan2015edge} \\[5mm]
+  \fullcite{gao2015cloudlets} \\[5mm]
+  \fullcite{ha2017you} \\[5mm]
+  \fullcite{hu2016quantifying}
+\end{quote}
+\end{leftbar}
+
+%%% Local Variables:
+%%% coding: utf-8
+%%% mode: latex
+%%% TeX-engine: xetex
+%%% TeX-master: "../thesis"
+%%% End:

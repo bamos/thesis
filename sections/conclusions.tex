@@ -1,0 +1,98 @@
+\chapter{Conclusions and Future Directions}
+\label{sec:conclusions}
+
+In this thesis we have introduced new building blocks and
+fundamental components for machine learning that enable
+optimization-based domain knowledge to be injected
+into the modeling pipeline.
+We have presented the \emph{OptNet} architecture as a
+foundation for convex optimization layers and the
+\emph{input-convex neural network} architecture as a
+foundation for deep convex energy-based learning.
+We have shown how these techniques can be applied to
+differentiable model-predictive control and
+top-$k$ learning.
+Differentiable optimization-based modeling components
+provide an expressive set of operations and
+have a promising set of future directions.
+To enable rapid prototyping in this space, we have shown
+how \cvxpy can be turned into a differentiable layer.
+In the following we discuss areas where optimization-based
+has been applied and has potential to continue making
+an impact.
+
+\begin{itemize}
+\item \textbf{Game theory.}
+  The game theory literature typically focuses on finding
+  optimal strategies of playing games with known rules.
+  While the rules of a lot of games are known explicitly,
+  scenarios could come up where it's useful to learn the
+  rules of a game and to have a ``game theory''
+  equilibrium-finding layer.
+  For example in reinforcement learning, an agent can have an
+  arbitrary differentiable ``game theory'' layer that is able
+  of representing complex tasks, state spaces, and
+  problems as an equilibrium-finding problem in a game
+  where the rules are automatically extracted.
+  This has started to be explored in
+  \citet{ling2018game}.
+\item \textbf{Stochastic optimization and end-to-end learning.}
+  Typically probabilistic models are used in the context of
+  larger systems. When these systems have an objective
+  that is being optimized, it is usually ideal to incorporate
+  the knowledge of this objective into the probabilistic modeling
+  component.
+  If the downstream systems involve solving
+  stochastic optimization problems, as in power-systems,
+  creating an end-to-end differentiable architecture is
+  more difficult and can be done by using
+  differentiable optimization \citep{donti2017task}.
+\item \textbf{Reinforcement learning and control.}
+  \begin{itemize}
+  \item RL agents may be deployed in scenarios when
+    the agent should avoid parts of the state space,
+    \eg in safety-critical environments.
+    Differentiable optimization layers can be used
+    to help constrain the policy class so that these
+    regions are avoided.
+    This is starting to be explored in
+    \citet{dalal2018safe,pham2018optlayer}.
+  \item When RL environments involve physical systems,
+    it may be useful to have a physics-based modeling.
+    This can be done with a differentiable
+    physics engines as in \citet{de2018end}.
+  \item Shaping the cost function of a
+    controller as in \citet{tamar2017learning}.
+  \item Differentiable control and planning:
+    \citet{chen2018optimal,chen2018approximating,karkus2018integrating}
+  \item Universal planning networks: \citep{srinivas2018universal}
+  \end{itemize}
+\item \textbf{Discrete, combinatorial, and submodular optimization.}
+  The space of discrete, combinatorial, and mixed optimization problems
+  captures an even more expressive set of operations than
+  the continuous and convex optimization problems we have considered
+  in this thesis.
+  Similar optimization components can be made for some of these
+  types of problems, as explored in
+  \citet{djolonga2017differentiable,tschiatschek2018differentiable,mensch2018differentiable,niculae2018sparsemap,niculae2017regularized}.
+\item \textbf{Meta-learning.}
+  Some meta-learning formulations such as \citet{finn2017model}
+  and \citet{ravi2016optimization}
+  involve learning through an unrolled optimizer that
+  typically solve an unconstrained, continuous, and
+  non-convex optimization problem.
+  In some cases, unrolling through a solver with
+  many iterations may require inefficient amounts
+  of compute or memory.
+  Meta-learning methods could be improved by using a differentiable
+  closed-form solver as
+  \citet{bertinetto2018meta} explores.
+\item Deep layers as stochastic solvers \citep{bibi2018deep}
+\end{itemize}
+
+%%% Local Variables:
+%%% coding: utf-8
+%%% mode: latex
+%%% TeX-engine: xetex
+%%% TeX-master: "../thesis"
+%%% End:

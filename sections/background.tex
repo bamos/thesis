@@ -1,0 +1,611 @@
+\chapter{Preliminaries and Background}
+This section provides a broad overview of foundational ideas
+and background material relevant to this thesis.
+In most chapters of this thesis, we include a deeper
+discussion of the related literature relevant to
+that material.
+
+\section{Preliminaries}
+The content in this thesis builds on the following topics.
+We assume preliminary knowledge of these topics and
+give a limited set of key references here.
+The reader should have an understanding of statistical
+and machine learning modeling paradigms as described in
+\citet{wasserman2013all,bishop2007pattern,friedman2001elements}.
+Our contributions mostly focus on end-to-end modeling with
+deep architectures as described in
+\citet{schmidhuber2015deep,goodfellow2016deep} with
+applications in computer vision as described in
+\citet{forsyth2003modern,bishop2007pattern,szeliski2010computer}.
+Our contributions also involve optimization theory and
+applications as described in
+\citet{bertsekas1999nonlinear,boyd2004convex,bonnans2013perturbation,griewank2008evaluating,nocedal2006sequential,sra2012optimization,wright1997primal}.
+One application area of this thesis work focuses on control
+and reinforcement learning.
+Control is one kind of optimization-based modeling and
+is further described in
+\citet{bertsekas2005dynamic,sastry2011adaptive,levine2017optimal}.
+Reinforcement learning methods are summarized in
+\citet{sutton1998reinforcement,levine2017introduction}.
+
+\section{Energy-based Learning}
+Energy-based learning is a machine learning method
+typically used in supervised settings that explicitly
+adds relationships and dependencies to the model's
+output space.
+This is in contrast to purely feed-forward models that
+typically cannot explicitly capture dependencies
+in the output space.
+At the core of energy-based learning methods is
+a scalar-valued \emph{energy} function
+$E_\theta(x,y): \mathcal{X}\times\mathcal{Y}\rightarrow \mathbb{R}$
+parameterized by $\theta$ that measures the fit
+between some input $x$ and output $y$.
+Inference in energy-based models is done by
+solving the optimization problem
+\begin{equation}
+  \label{eq:bg:inf}
+  \hat y = \argmin_{y} E_\theta(x, y).
+\end{equation}
+We note that this is a powerful formulation for
+modeling and learning and subsumes the representational
+capacity of standard deep feedforward models,
+which we show how to do in \cref{sec:bg:ff-energy}.
+The energy function can also be interpreted
+from a probabilistic lens as the negated unnormalized
+joint distribution over the input and output spaces.
+
+Energy-based methods have been in use for over a decade
+and the tutorial \citet{lecun2006tutorial} overviews
+many of the foundational methods and challenges
+in energy-based learning.
+The two main challenges for energy-based learning are
+1) learning the parameters $\theta$ of the energy
+function $E_\theta$ and 2) efficiently solving
+the inference procedure in \cref{eq:bg:inf}.
+These challenges have historically been tamed by
+using simpler energy functions consisting of
+hand-engineered feature extractors for the inputs
+$x$ and linear functions of $y$.
+This captures models such as Markov random fields
+\citep{li1994markov}
+and conditional random fields
+\citep{lafferty2001conditional,sutton2012introduction}.
+Standard gradient-based methods are difficult to use
+for parameter learning because $\hat y$ depends on $\theta$
+through the $\argmin$ operator, which is not always differentiable.
+Historically, a common approach to doing parameter learning
+in energy-based models has been to directly shape the
+energy function with a max-margin approach
+\citet{taskar2004max,taskar2005learning}.
+
+More recently, there has been a strong push to further incorporate
+structured prediction methods like conditional random fields as the
+``last layer'' of a deep network architecture
+\citep{peng2009conditional,zheng2015conditional,chen2015learning}
+as well as in deeper energy-based architectures
+\citep{belanger2016structured,belanger2017end,belanger2017deep},
+which we further discuss in \cref{sec:bg:spens}.
+
+An ongoing discussion in the community argues whether
+adding the dependencies explicitly in an energy-based is useful or not.
+Feedforward models have a remarkable representational
+capacity that can implicitly learn the dependencies and
+relationships from data without needing to impose
+additional structure or modeling assumptions and
+without making the model more computationally
+expensive with an optimization-based inference procedure.
+One argument against this viewpoint that supports
+energy-based modeling is that explicitly including
+modeling information improves the data efficiency
+and requires less samples to learn because some
+structure and knowledge is already present in the model
+and does not have to be learned from scratch.
+
+\subsection{Energy-based Models Subsume Feedforward Models}
+\label{sec:bg:ff-energy}
+We highlight the power of energy-based modeling for supervised
+learning by noting how they subsume deep feedforward models.
+Let $\hat y = f_\theta(x)$ be a deep feedfeedforward model.
+The energy-based representation of this model is
+$E(x,y) = ||y-f_\theta(x)||_2^2$
+and inference becomes the convex optimization problem
+$\hat y = \argmin_y E(x,y)$, which
+has the exact solution $\hat y = f_\theta(x)$.
+An energy function that has more structure over the output
+space adds representational capacity that a feedforward
+model wouldn't be able to capture explicitly.
+
+\subsection{Structured Prediction Energy Networks}
+\label{sec:bg:spens}
+Structured Prediction Energy Networks (SPENs)
+\citep{belanger2016structured,belanger2017end,belanger2017deep}
+are a way of bridging the gap between modern deep
+learning methods and classical energy-based learning
+methods.
+SPENs provide a deep structure over input and output spaces
+by representing the energy function $E_\theta(x,y)$ with
+a standard feed-forward neural network.
+This expressive formulation comes at the cost of making
+the inference procedure in \cref{eq:bg:inf} difficult
+and non-convex.
+SPENs typically use an approximate inference procedure
+by taking a fixed-number of gradient descent steps
+for inference.
+For learning, SPENs typically replace the inference with
+an \emph{unrolled gradient-based optimizer}
+that starts with some prediction $y_0$ and
+takes a fixed number of gradient steps to minimize
+the energy function
+$$y_{i+1} = y_i - \alpha \nabla_y E_\theta(x,y_i).$$
+The final iterate as then taken as the prediction
+$\hat y \triangleq y_N$.
+Gradient-based parameter learning can be done by
+differentiating the prediction $\hat y$ with respect
+to $\theta$ by unrolling the inference procedure.
+Unrolling the inference procedure
+can be done in most autodiff frameworks such as
+PyTorch \citep{paszke2017automatic}
+or TensorFlow \citep{abadi2016tensorflow}.
+activation functions with smooth first derivatives
+such as the sigmoid or softplus \citep{glorot2011deep}
+should be used to avoid discontinuities because
+unrolling the inference procedure involves computing
+$\nabla_\theta \nabla_y E_\theta(x,y)$.
+
+\section{Modeling with Domain-Specific Knowledge}
+\label{sec:bg:dsn}
+The role of domain-specific knowledge in the machine learning
+and computer vision fields has been an active discussion topic
+over the past decade and beyond.
+Historically, domain knowledge such as fixed hand-crafted
+feature and edge detectors were rigidly part of the
+computer vision pipeline and have been overtaken by
+learnable convolutional models \citet{lecun1998mnist,krizhevsky2012imagenet}.
+To highlight the power of convolutional architectures, they
+provide a reasonable prior for vision tasks even without
+learning \citep{ulyanov2018deep}.
+Machine learning models extend far beyond the reach
+of vision tasks and the community has a growing interest
+on domain-specific priors rather than just using
+fully-connected architectures.
+These priors ideally can be integrated as end-to-end
+learnable modules into a larger system that are
+learned as a whole with gradient-based information.
+In contrast to pure fully-connected architectures,
+specialized submodules ideally improve the data
+efficiency of the model, add interpretability,
+and enable grey-box verification.
+
+Recent work has gone far beyond the classic examples of
+adding modeling priors by using convolutional or
+sequential models.
+A full discussion of all of the
+recent improvements is beyond the scope of this thesis,
+and here we highlight a few key recent
+developments.
+% \todon{Re-phrase some of these}
+\begin{itemize}
+\item Differentiable beam search \citep{goyal2018continuous}
+  and differentiable dynamic programming \citep{mensch2018differentiable}
+\item Differentiable protein simulator \citep{ingraham2018learning}
+\item Differentiable particle filters \citep{jonschkowski2018differentiable}
+\item Neural ordinary differential equations \citep{chen2018neural}
+  and applications to reversible generative models \citep{grathwohl2018ffjord}
+\item Relational reasoning on sets, graphs, and trees
+  \citep{battaglia2018relational,zaheer2017deep,
+    kipf2016semi,gilmer2017neural,santoro2017simple,
+    hamilton2017inductive,battaglia2016interaction,
+    xu2018powerful,farquhar2017treeqn,shen2018ordered}
+\item Geometry-based priors
+  \citep{bronstein2017geometric,gulcehre2018hyperbolic,
+     monti2017geometric,tang2018ba,li2018smoothing}
+\item Memory \citep{sukhbaatar2015end,graves2014neural,graves2016hybrid,xiong2016dynamic,hill2015goldilocks,parisotto2017neural}
+\item Attention \citep{bahdanau2014neural,vaswani2017attention,wang2018non}
+\item Capsule networks \citep{sabour2017dynamic,hinton2018matrix,xinyi2018capsule}
+\item Program synthesis
+\citep{reed2015neural,neelakantan2015neural,balog2016deepcoder,devlin2017robustfill,parisotto2016neuro}
+\end{itemize}
+
+\section{Optimization-based Modeling}
+\label{sec:bg:opt}
+Optimization can be used for modeling in machine learning.
+Among many other applications, these architectures are well-studied for
+generic classification and structured prediction tasks
+\citep{goodfellow2013multi,stoyanov2011empirical,brakel2013training,lecun2006tutorial,belanger2016structured,belanger2017end};
+in vision for tasks such as denoising
+\citep{tappen2007learning,schmidt2014shrinkage}
+or edge-aware smoothing \citep{barron2016fast}.
+\citet{metz2016unrolled} uses unrolled optimization within a network to
+stabilize the convergence of generative adversarial networks
+\citep{goodfellow2014generative}.
+Indeed, the general idea of solving restricted classes of
+optimization problem using neural networks goes back
+many decades \citep{kennedy1988neural, lillo1993solving},
+but has seen a number of advances in recent years.
+These models are often trained by one of
+the following four methods.
+
+\subsection{Explicit Differentiation}
+If an analytic solution to the argmin can be found,
+such as in an unconstrained quadratic minimization,
+the gradients can often also be computed analytically.
+This is done in \citet{tappen2007learning,schmidt2014shrinkage}.
+We cannot use these methods for
+the constrained optimization problems
+we consider in this thesis because
+there are no known analytic solutions.
+
+\subsection{Unrolled Differentiation}
+\label{sec:bg:unroll}
+The argmin operation over an unconstrained objective can be approximated
+by a first-order gradient-based method and unrolled.
+These architectures typically introduce an optimization
+procedure such as gradient descent into the inference procedure.
+This is done in
+\citet{domke2012generic,belanger2017end,metz2016unrolled,goodfellow2013multi,stoyanov2011empirical,brakel2013training,finn2017model}.
+The optimization procedure is unrolled automatically or manually
+\citep{domke2012generic} to obtain derivatives during training that incorporate
+the effects of these in-the-loop optimization procedures.
+
+Given an unconstrained optimization problem with a
+parameterized objective
+$$\argmin_x f_\theta(x),$$
+gradient descent starts at an initial value $x_0$ and
+takes steps $$x_{i+1} = x_i - \alpha \nabla_x f_\theta(x).$$
+For learning, the final iterate of this procedure $x_N$ can
+be taken as the output and
+$\partial x_N/\partial \theta$ can
+be computed with automatic differentiation.
+
+In all of these cases, the optimization problem is unconstrained
+and unrolling gradient descent is often easy to do.
+When constraints are added to the optimization problem, iterative
+algorithms often use a projection operator that may be difficult
+to unroll through and storing all of the intermediate iterates
+may become infeasible.
+
+\subsection{Implicit argmin differentiation}
+\label{sec:bg:argmin-diff}
+Most closely related to this thesis work, there have been
+several applications of the implicit function theorem
+to differentiating through constrained convex argmin
+operations.
+These methods typically parameterize an optimization problem's
+objective or constraints and then applies the
+\emph{implicit function theorem} (\cref{theorem:implicit})
+to optimality conditions
+of the optimization problem that implicitly define
+the solution, such as the \emph{KKT conditions}
+\citep[Section~5.5.3]{boyd2004convex}.
+We will first review the implicit function theorem
+and KKT conditions and then discuss related work
+in this space.
+
+\emph{Implicit function} analysis
+\citep{dontchev2009implicit}
+typically focuses on solving an equation $f(p,x)=0$ for $x$ as
+a function $s$ of $p$, \ie $x=s(p)$.
+\emph{Implicit differentiation} considers how to
+differentiate the solution mapping with respect
+to the parameters, \ie $\nabla_p s(p)$.
+The \emph{implicit function theorem} used in standard
+calculus textbooks can be traced back to the
+lecture notes from 1877-1878 of \citet{dini1877analisi}
+and is presented in
+\citet[Theorem~1.B.1]{dontchev2009implicit} as follows.
+
+\begin{theorem}[Implicit function theorem]
+  \label{theorem:implicit}
+  Let $f: \RR^d \times \RR^n \rightarrow \RR^n$ be continuously
+  differentiable in a neighborhood of
+  $(\bar p, \bar x)$ and such that $f(\bar p, \bar x)=0$,
+  and let the partial Jacobian of $f$ with respect to
+  $x$ at $(\bar p, \bar x)$, namely $\nabla_x f(\bar p, \bar x)$,
+  be nonsingular. Then the solution mapping
+  $S(p) = \menge{x\in \RR^n}{f(p,x)=0}$ has a single-valued
+  localization $s$ around $\bar p$ for $\bar x$ which
+  is continuously differentiable in a neighborhood $Q$
+  of $\bar p$ with Jacobian satisfying
+  $\nabla s(p) = -\nabla_x f(p, s(p))^{-1} \nabla_p f(p, s(p))$
+  for every $p\in Q$.
+\end{theorem}
+
+In addition to the content in this thesis, several other papers
+apply the implicit function theorem to differentiate through
+the argmin operators.
+This approach frequently comes up in bilevel optimization
+\citep{gould2016differentiating,kunisch2013bilevel}
+and sensitivity analysis
+\citep{bertsekas1999nonlinear,fiacco1990sensitivity,bell2008algorithmic,bonnans2013perturbation}.
+\citep{barratt2018differentiability} is a note on applying the
+implicit function theorem to the KKT conditions of convex
+optimization problems and highlights assumptions behind the
+derivative being well-defined.
+\citet{gould2016differentiating} describes general techniques for
+differentiation through optimization problems,
+but only describe the case of exact equality constraints rather than
+both equality and inequality constraints
+(they add inequality constraints via a barrier function).
+\citet{johnson2016composing} performs implicit differentiation on
+(multi-)convex objectives with coordinate subspace constraints.
+The older work of \citet{mairal2012task} considers argmin
+differentiation for a LASSO problem, derives specific rules for this case, and
+presents an efficient algorithm based upon our ability to solve
+the LASSO problem efficiently.
+\citet{jordan2015convex} studies convex optimization over probability
+measures and implicit differentiation in this context.
+\citet{bell2008algorithmic} adapts automatic differentiation
+to obtain derivatives of implicitly defined functions.
+
+\subsection{An optimization view of the ReLU, sigmoid, and softmax}
+\label{sec:bg:existing}
+In this section we note how the commonly used ReLU, sigmoid, and softmax
+functions can be interpreted as explicit closed-form solutions
+to constrained convex optimization (argmin) problems.
+We use these as examples to further highlight the power of
+optimization-based inference, not to provide a new analysis
+of these layers.
+In this thesis, we propose new optimization-based inference
+layers that do \emph{not} have explicit closed-form solutions
+like these examples and show that they can still be efficiently
+turned into differentiable building blocks for end-to-end architectures.
+
+\begin{theorem}
+  The ReLU, defined by $f(x) = \max\{0, x\}$,
+  can be interpreted as projecting a point $x\in\RR^n$ onto
+  the non-negative orthant as
+  \begin{equation}
+    f(x) = \argmin_y \;\; \frac{1}{2}||x-y||_2^2 \;\; \st \;\; y\geq 0.
+    \label{eq:relu-proj}
+  \end{equation}
+\end{theorem}
+
+\begin{proof}
+  The usual solution can be obtained by looking at
+  the KKT conditions of \cref{eq:relu-proj}.
+  Introducing a dual variable $\lambda\geq 0$ for the inequality
+  constraint, the Lagrangian of \cref{eq:relu-proj} is
+  \begin{equation}
+    L(y, \lambda)=\frac{1}{2}||x-y||_2^2 - \lambda^\top y.
+  \end{equation}
+  The stationarity condition
+  $\nabla_y L(y^\star, \lambda^\star) = 0$
+  gives a way of expressing the primal optimal
+  variable $y^\star$ in terms of the dual optimal
+  variable $\lambda^\star$ as $y^\star=x+\lambda^\star$.
+  Complementary slackness $\lambda^\star_i(x_i+\lambda^\star_i)=0$
+  shows that $\lambda^\star_i\in\{0, -x_i\}$.
+  Consider two cases:
+  \begin{itemize}
+  \item \textbf{Case 1:} $x_i\geq 0$.
+    Then $\lambda^\star_i$ must be 0
+    since we require $\lambda^\star\geq 0$.
+    Thus $y^\star_i=x_i+\lambda^\star_i=x_i$.
+  \item \textbf{Case 2:} $x_i< 0$.
+    Then $\lambda^\star_i$ must be $-x_i$
+    since we require $y\geq 0$.
+    Thus $y^\star_i=x_i+\lambda^\star_i=0$.
+  \end{itemize}
+  Combining these cases gives the usual solution of
+  $y^\star=\max\{0, x\}$.
+\end{proof}
+
+\begin{theorem}
+  The sigmoid or logistic function, defined by $f(x) = (1+e^{-x})^{-1}$,
+  can be interpreted as projecting a point $x\in\RR^n$ onto
+  the interior of the unit hypercube as
+  \begin{equation}
+    f(x) = \argmin_{0<y<1} \;\; -x^\top y -H_b(y),
+    \label{eq:sigmoid-proj}
+  \end{equation}
+  where $H_b(y) = - \left(\sum_i y_i\log y_i + (1-y_i)\log (1-y_i)\right)$ is the
+  binary entropy function.
+\end{theorem}
+
+\begin{proof}
+  The usual solution can be obtained by looking at
+  the first-order optimality condition of
+  \cref{eq:sigmoid-proj}.
+  The domain of the binary entropy function $H_b$ restricts
+  us to $0<y<1$ without needing to explicitly represent this
+  as a constraint in the optimization problem.
+  Let $g(y; x) = -x^\top y -H_b(y)$ be the objective.
+  The first-order optimality condition $\nabla_y g(y^\star; x) = 0$
+  gives us $-x_i + \log y_i^\star - \log (1-y_i^\star) = 0$
+  and thus $y^\star = (1+e^{-x})^{-1}$.
+\end{proof}
+
+\begin{theorem}
+  The softmax, defined by $f(x)_j = e^{x_j} / \sum_i e^{x_i}$,
+  can be interpreted as projecting a point $x\in\RR^n$ onto
+  the interior of the $(n-1)$-simplex
+  $$\Delta_{n-1}=\{p\in\RR^n\; \vert\; 1^\top p = 1 \; \; {\rm and} \;\; p \geq 0 \}$$
+  as
+  \begin{equation}
+    f(x) = \argmin_{0<y<1} \;\; -x^\top y - H(y) \;\; \st\;\; 1^\top y = 1
+    \label{eq:simplex-proj}
+  \end{equation}
+  where $H(y) = -\sum_i y_i \log y_i$ is the entropy function.
+\end{theorem}
+
+\begin{proof}
+  The usual solution can be obtained by looking at
+  the KKT conditions of \cref{eq:simplex-proj}.
+  Introducing a scalar-valued dual variable $\nu$ for the
+  equality constraint, the Lagrangian is
+  \begin{equation}
+    L(y, \nu) = -x^\top y - H(y) + nu(1^\top y - 1)
+  \end{equation}
+  The stationarity condition
+  $\nabla_y L(y^\star, \lambda^\star) = 0$
+  gives a way of expressing the primal optimal
+  variable $y^\star$ in terms of the dual optimal
+  variable $\nu^\star$ as
+  \begin{equation}
+    \label{eq:simplex-proj-pd}
+    y^\star_j=\exp\{x_j-1-\nu^\star\}.
+  \end{equation}
+  Putting this back into the equality constraint
+  $1^\top y^\star = 1$ gives us
+  $\sum_i \exp\{x_i-1-\nu^\star\} = 1$ and thus
+  $\nu^\star = \log\sum_i\exp\{x_i-1\}$.
+  Substituting this back into \cref{eq:simplex-proj-pd}
+  gives us the usual definition of
+  $y_j = e^{x_j} / \sum_i e^{x_i}$.
+\end{proof}
+
+\begin{corollary}
+A temperature-scaled softmax scales the entropy term in the objective
+and the sparsemax \citep{martins2016softmax} replaces the
+objective's entropy penalty with a ridge section.
+\end{corollary}
+
+\section{Reinforcement Learning and Control}
+\label{sec:bg:rl}
+
+The fields of reinforcement learning (RL) and optimal control
+typically involve creating agents that act optimally
+in an environment.
+These environments can typically be represented
+as a Markov decision process (MDP) with a continuous
+or discrete state space and a continuous or discrete action space.
+The environment often has some oracle-given
+reward associated with each state and the goal of RL
+and control is to find a policy that maximizes the
+cumulative reward achieved.
+
+Using the notation from \citep{levine2017introduction},
+\emph{policy search} methods learn a policy $\pi_\theta(u_t|x_t)$
+parameterized by $\theta$ that predicts a distribution over next
+action to take given the current state $x_t$.
+The goal of policy search is to find a policy that maximizes the
+expected return
+\begin{equation}
+  \argmax_\theta\; \E_{\tau\sim p_\theta(\tau)} \left[ \sum_t \gamma^t r(x_t, u_t) \right],
+\end{equation}
+where $p_\theta(\tau)=p(x_1)\prod\pi_\theta(u_t|x_t)p(x_{t+1}|x_t,u_t)$
+is the distribution over trajectories,
+$\gamma\in(0,1]$ is a discount factor,
+$r(x_t, u_t)$ is the state-action reward at time $t$,
+and $p(x_{t+1}|x_t,u_t)$ is the state-transition probability.
+In many scenarios, the reward $r$ is assumed to be
+a black-box function that derivative information cannot
+be obtained from.
+\emph{Model-free} techniques for policy search typically do
+not attempt to model the state-transition probability
+while \emph{model-based} and \emph{control} approaches do.
+
+\emph{Control approaches} typically provide a policy
+by planning based on known state transitions.
+For example, in continuous state-action spaces with deterministic
+state transitions, the finite-horizon model predictive control problem is
+\begin{equation}
+    \argmin_{x_{1:T} \in \mathcal{X},u_{1:T}\in \mathcal{U}} \;\; \sum_{t=1}^T  C_t(x_t, u_t)
+    \;\; \subjectto \;\; x_{t+1} = f(x_t, u_t), \;\; x_1 = \xinit,
+\end{equation}
+where $\xinit$ is the current system state,
+the cost $C_t$ is typically hand-engineered and differentiable,
+and $x_{t+1}=f(x_t, u_t)$ is the deterministic
+next-state transition, \ie~the point-mass given by $p(x_{t+1}|x_t,u_t)$.
+While this thesis focuses on the continuous and deterministic setting,
+control approaches can also be applied in discrete
+and stochastic settings.
+
+\textbf{Pure model-free techniques for policy search} have
+demonstrated promising results in many domains by learning
+\emph{reactive polices} which directly map observations to actions
+\citep{mnih2013playing,oh2016minecraft,gu2016continuous,lillicrap2015continuous,
+schulman2015trust,schulman2016trpogae,gu2017qprop}.
+Despite their success, model-free methods have many drawbacks and limitations,
+including a lack of interpretability, poor generalization, and a
+high sample complexity.
+\textbf{Model-based methods} are known to be more sample-efficient
+than their model-free
+counterparts.
+These methods generally rely on learning a dynamics model directly from
+interactions with the real system and then integrate the learned model into the
+control policy
+\citep{schneider1997exploiting,abbeel2006using,deisenroth2011pilco,heess2015learning,
+boedecker2014sparsegps}.
+More recent approaches use a deep network to learn low-dimensional latent state
+representations and associated dynamics models in this learned representation.
+They then apply standard trajectory optimization methods
+on these learned embeddings
+\citep{lenz2015deepmpc, watter2015embed, levine2016end}.
+However, these methods still require a manually specified and hand-tuned
+cost function, which can become even more difficult in a latent representation.
+Moreover, there is no guarantee that the learned dynamics model
+can accurately capture portions of the state space relevant for the task at hand.
+
+To leverage the benefits of both approaches, there has been significant
+interest in \textbf{combining the model-based and model-free paradigms.}
+In particular, much attention has been dedicated to utilizing
+model-based priors to accelerate the model-free learning process.
+For instance, synthetic training data can be generated by model-based control
+algorithms to guide the policy search or prime a
+model-free policy
+\citep{sutton1990integrated,theodorou2010generalized,levine2014learning,
+gu2016continuous,venkatraman2016improved,levine2016end,chebotar2017combining,
+nagabandi2017mbmf, liting2017driving}.
+\citep{bansal2017mbmf} learns a controller and then distills it to
+a neural network policy which is then fine-tuned with model-free
+policy learning.
+However, this line of work usually keeps the model separate from the
+learned policy.
+
+Alternatively, the policy can include an \textbf{explicit planning module}
+which \emph{leverages learned models} of the system or environment,
+both of which are learned through model-free techniques.
+For example, the classic Dyna-Q algorithm
+\citep{sutton1990integrated} simultaneously learns a model of
+the environment and uses it to plan.
+More recent work has explored incorporating such structure into deep
+networks and learning the policies in an end-to-end fashion.
+\citet{tamar2016value} uses a recurrent network to predict the value function by
+approximating the value iteration algorithm with convolutional layers.
+\citet{karkus2017qmdp} connects a dynamics model to a planning
+algorithm and formulates the policy as a structured recurrent network.
+\citet{silver2016predictron} and \citet{oh2017value} perform multiple rollouts
+using an abstract dynamics model to predict the value function.
+A similar approach is taken by \citet{weber2017imagination} but directly
+predicts the next action and reward from rollouts of an explicit environment model.
+\citet{farquhar2017treeqn} extends model-free approaches, such as
+DQN \citep{mnih2015human} and A3C \citep{mnih2016asynchronous}, by planning
+with a tree-structured neural network to predict the cost-to-go.
+While these approaches have demonstrated impressive results in
+discrete state and action spaces, they are not applicable to
+continuous control problems.
+
+To tackle continuous state and action spaces, \citet{pascanu2017learning}
+propose a neural architecture which uses an abstract environmental
+model to plan and is trained directly from an external task loss.
+\citet{pong2018temporal} learn goal-conditioned value functions and use them
+to plan single or multiple steps of actions in an MPC fashion.
+Similarly, \citet{pathak2018zero} train a goal-conditioned policy to perform
+rollouts in an abstract feature space but ground the policy with a loss term
+which corresponds to true dynamics data.
+The aforementioned approaches can be interpreted as a distilled optimal controller
+which does not separate components for the cost and dynamics.
+Taking this analogy further, another strategy is to differentiate through an
+optimal control algorithm itself.
+\citet{okada2017path} and \citet{pereira2018pinets} present a way
+to differentiate through path integral optimal control
+\citep{williams2016aggressive,williams2017model}
+and learn a planning policy end-to-end.
+\citet{srinivas2018universal} shows how to embed
+differentiable planning (unrolled gradient descent over actions) within
+a goal-directed policy.
+In a similar vein, \citet{tamar2017learning} differentiates
+through an iterative LQR (iLQR) solver
+\citep{li2004ilqr,xie2017ddp,tassa2014control}
+to learn a cost-shaping term offline.
+This shaping term enables a shorter horizon controller to approximate the
+behavior of a solver with a longer horizon to save computation during runtime.
+
+%%% Local Variables:
+%%% coding: utf-8
+%%% mode: latex
+%%% TeX-engine: xetex
+%%% TeX-master: "../thesis"
+%%% End:

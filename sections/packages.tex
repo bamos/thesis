@@ -1,0 +1,153 @@
+\usepackage[%
+colorlinks=true,allcolors=link_color,pageanchor=true,%
+plainpages=false,pdfpagelabels,bookmarks,bookmarksnumbered,%
+]{hyperref}
+
+\usepackage[style=alphabetic,natbib=true,backend=biber,maxnames=10]{biblatex}
+\bibliography{refs.bib}
+
+\DeclareFieldFormat{citehyperref}{%
+  \DeclareFieldAlias{bibhyperref}{noformat}% Avoid nested links
+  \bibhyperref{#1}}
+
+\DeclareFieldFormat{textcitehyperref}{%
+  \DeclareFieldAlias{bibhyperref}{noformat}% Avoid nested links
+  \bibhyperref{%
+    #1%
+    \ifbool{cbx:parens}
+      {\bibcloseparen\global\boolfalse{cbx:parens}}
+      {}}}
+
+\savebibmacro{cite}
+\savebibmacro{textcite}
+
+\renewbibmacro*{cite}{%
+  \printtext[citehyperref]{%
+    \restorebibmacro{cite}%
+    \usebibmacro{cite}}}
+
+\renewbibmacro*{textcite}{%
+  \ifboolexpr{
+    ( not test {\iffieldundef{prenote}} and
+      test {\ifnumequal{\value{citecount}}{1}} )
+    or
+    ( not test {\iffieldundef{postnote}} and
+      test {\ifnumequal{\value{citecount}}{\value{citetotal}}} )
+  }
+    {\DeclareFieldAlias{textcitehyperref}{noformat}}
+    {}%
+  \printtext[textcitehyperref]{%
+    \restorebibmacro{textcite}%
+    \usebibmacro{textcite}}}
+
+
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\definecolor{link_color}{RGB}{0,128,255}
+
+\usepackage[%
+letterpaper,twoside,vscale=.8,hscale=.75,nomarginpar,hmarginratio=1:1
+]{geometry}
+
+\usepackage{graphicx} % more modern
+\usepackage{subfigure}
+
+\usepackage{todonotes}
+\newcommand{\todon}[1]{\todo[color=red!40,inline,size=\small]{TODO: #1}}
+\newcommand{\todoc}{\todo[color=red!40,inline,size=\small]{TODO: Complete}}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{arydshln}
+
+
+\usepackage{accents}
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+
+\usepackage{stackengine}
+
+\usepackage{wrapfig}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+
+% \MakeRobust{\Call}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+
+\definecolor{lightgray}{gray}{0.95} % 10%
+
+\usepackage{hyperref}
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+
+\usepackage{easytable}
+
+\usepackage[capitalise,nameinlink,noabbrev]{cleveref}
+
+\usepackage{stmaryrd}
+
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\algnewcommand{\LeftComment}[1]{\Statex \(\triangleright\) #1}
+
+\newcounter{module}
+\makeatletter
+\newenvironment{module}[1][htb]{%
+  \let\c@algorithm\c@module
+    \renewcommand{\ALG@name}{Module}%
+   \begin{algorithm}[#1]%
+  }{\end{algorithm}}
+\makeatother
+\crefname{module}{Module}{Modules}
+
+\usepackage{booktabs}
+
+\usepackage{caption}
+
+\usepackage{listings,textcomp,color}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\lstset{language=Python,upquote=true,
+  basicstyle=\ttfamily\footnotesize,
+  commentstyle=\textit,stringstyle=\upshape,
+  numbers=left,numberstyle=\footnotesize,stepnumber=1,numbersep=5pt,
+  backgroundcolor=\color{backcolour},frame=single,tabsize=2,
+  showspaces=false,showstringspaces=false,showtabs=false,
+  breaklines=true,breakatwhitespace=true,escapeinside=||,
+  emph={cp, torch, cpth},emphstyle=\color{deepred},
+  keywordstyle=\color{deepblue},
+}
+
+% Python style for highlighting
+% \DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{12}  % for normal
+% \definecolor{deepgreen}{rgb}{0,0.5,0}
+% \lstset{
+% language=Python,
+% basicstyle=\ttm,
+% otherkeywords={self},             % Add keywords here
+% keywordstyle=\ttb\color{deepblue},
+% emph={cp},          % Custom highlighting
+% emphstyle=\ttb\color{deepred},    % Custom highlighting style
+% stringstyle=\color{deepgreen},
+% frame=tb,                         % Any extra options here
+% showstringspaces=false            %
+% }
+
+\usepackage{xspace}
+
+\usepackage{framed}
+
+
+%%% Local Variables:
+%%% coding: utf-8
+%%% mode: latex
+%%% TeX-engine: xetex
+%%% TeX-master: "../thesis"
+%%% End:
