@@ -15,6 +15,9 @@ scene graph generation. We show that LML layers add a negligible
 amount of computational overhead, strictly improve the
 model's representational capacity, and improve accuracy.
 
+The content of this chapter is joint work with
+J.~Zico Kolter and Vladlen Koltun.
+
 \section{Introduction}
 Multi-label prediction tasks show up frequently
 in computer vision and language processing.
@@ -65,11 +68,6 @@ scene graph generation.
   \label{fig:lml-example}
 \end{figure}
 
-TODO:
-Predict and Constrain: Modeling Cardinality in Deep Structured Prediction
-Collective Entity Resolution with Multi-Focal Attention
-Fast Exact Inference for Recursive Cardinality Models
-
 Our work is motivated by the ubiquity of
 projections onto polytopes in machine learning.
 We showed in \cref{sec:bg:existing} how the ReLU, sigmoid, and
@@ -82,8 +80,12 @@ or the Birkhoff polytope for permutations
 \citep{adams2011ranking,santa2018visual,mena2018learning}.
 
 The remainder of this section reviews related work on
-top-$k$ optimization, ranking-based loss functions,
-and scene graph generation.
+cardinality modeling, top-$k$ optimization,
+ranking-based loss functions, and scene graph generation.
+
+\subsection{Cardinality Modeling}
+TODO, discuss at least
+\cite{tarlow2012fast,globerson2016collective,brukhim2018predict}
 
 \subsection{Top-$k$ and Ranking-Based Loss Functions}
 \label{sec:lml:rw:topk}
@@ -920,6 +922,7 @@ the methods evaluated for top-$k$ optimization
 provide nearly identical gradient information
 to the model and only have small differences.
 
+\newpage
 \subsection{Scene Graph Generation}
 \begin{figure*}[ht!]
   \centering
@@ -1104,7 +1107,6 @@ edge is a reasonable heuristic.
   Scene graph generation on the Visual Genome: Best Validation Recall Scores
 }
 \label{tab:sg-results-val}
-\vspace*{4in}
 \end{table*}
 
 \section{Conclusions}

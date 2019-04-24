@@ -333,12 +333,11 @@ which can be re-written as
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.7\textwidth]{overview.png}
+  \includegraphics[width=0.9\textwidth]{overview.pdf}
   \caption{
     Summary of our differentiable \cvxpy layer that allows
     users to easily turn most convex optimization problems into
     layers for end-to-end machine learning.
-    (TODO: Replace with proper diagram.)
   }
   \label{fig:overview}
 \end{figure}
@@ -389,8 +388,8 @@ cone program in \cref{eq:cp} and have a solution
 $\xstar, \sstar, \ystar$.
 We now show how to compute
 $\partial \xstar/\partial \theta$.
-This derivation was concurrently considered by
-\citet{busseti2019derivative}.
+This derivation was concurrently considered and done by
+\citet{agrawal2019differentiating}.
 
 We construct $\ustar=(\xstar, \ystar, 1)$,
 and $\vstar=(0,\sstar, 0)$, and $\zstar=\ustar-\vstar$.

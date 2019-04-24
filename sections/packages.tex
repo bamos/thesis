@@ -6,6 +6,10 @@ plainpages=false,pdfpagelabels,bookmarks,bookmarksnumbered,%
 \usepackage[style=alphabetic,natbib=true,backend=biber,maxnames=10]{biblatex}
 \bibliography{refs.bib}
 
+\usepackage{totcount}
+\newtotcounter{citenum}
+\AtEveryBibitem{\stepcounter{citenum}}
+
 \DeclareFieldFormat{citehyperref}{%
   \DeclareFieldAlias{bibhyperref}{noformat}% Avoid nested links
   \bibhyperref{#1}}
