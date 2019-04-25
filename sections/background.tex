@@ -439,10 +439,10 @@ turned into differentiable building blocks for end-to-end architectures.
   Introducing a scalar-valued dual variable $\nu$ for the
   equality constraint, the Lagrangian is
   \begin{equation}
-    L(y, \nu) = -x^\top y - H(y) + nu(1^\top y - 1)
+    L(y, \nu) = -x^\top y - H(y) + \nu(1^\top y - 1)
   \end{equation}
   The stationarity condition
-  $\nabla_y L(y^\star, \lambda^\star) = 0$
+  $\nabla_y L(y^\star, \nu^\star) = 0$
   gives a way of expressing the primal optimal
   variable $y^\star$ in terms of the dual optimal
   variable $\nu^\star$ as
