@@ -93,7 +93,7 @@ implicitly differentiating the residual map from
 \citet{busseti2018solution},
 which is of standalone interest as
 this shows how to differentiate through optimization
-problems with non-polyhedral constraints.
+problems with non-polytope constraints.
 
 \section{Background}
 \subsection{The \cvxpy modeling language}
@@ -697,7 +697,7 @@ projection problem
 \hat y = \argmin_y\;\; &\frac{1}{2}||p-y||_2^2  \\
  {\rm s.t.}\;\; & Gy\leq h \\
 \end{align*}
-Suppose we don't know the polyhedral parameters $\theta=\{G, h\}$
+Suppose we don't know the polytope's parameters $\theta=\{G, h\}$
 and want to learn them from data.
 Then using the MSE for $\ell$, we can randomly initialize
 ellipsoids $\theta$ and learn them with gradient steps $\nabla_\theta \ell$.
@@ -708,7 +708,7 @@ and unobserved part of the model, of if you want to take an
 approximate convex hull that limits the number of polytope edges.
 
 We can implement this layer with the following code.
-\cref{fig:polyhedral-results} shows the results of learning
+\cref{fig:polytope-results} shows the results of learning
 on two examples.
 Each problem has a true known polytope that we show in blue
 and the model's approximation is in red.
@@ -727,7 +727,7 @@ x = cp.Variable(n)
 obj = cp.Minimize(0.5*cp.sum_squares(x-p))
 cons = [0.5*cp.quad_form(x-z, A) <= 1]
 prob = cp.Problem(obj, cons)
-layer = cpth.CvxpyLayer(prob, params=[p, A, z], out=[x])
+layer = CvxpyLayer(prob, params=[p, A, z], out=[x])
 \end{lstlisting}
 
 \begin{figure}[t]
@@ -736,9 +736,9 @@ layer = cpth.CvxpyLayer(prob, params=[p, A, z], out=[x])
   \cblock{190}{201}{216} True Polytope \enskip
   \cblock{176}{128}{131} Approximate Polytope
   \caption{
-    Learning polyhedrally constrained problems.
+    Learning polytope constrained problems.
   }
-  \label{fig:polyhedral-results}
+  \label{fig:polytope-results}
 \end{figure}
 
 \newpage
@@ -753,8 +753,8 @@ projection of the form
 \end{align*}
 with ellipsoid parameters $\theta=\{A,z\}$
 This is an interesting optimization problem to consider because
-it is an example of doing learning with a non-polyhedral cone
-program (a SOCP), which prior approaches such as OptNet
+it is an example of doing learning with a non-polytope
+cone program (a SOCP), which prior approaches such as OptNet
 could not easily handle.
 
 We can implement this layer with the following code.
@@ -777,7 +777,7 @@ x = cp.Variable(n)
 obj = cp.Minimize(0.5*cp.sum_squares(x-p))
 cons = [0.5*cp.quad_form(x-z, A) <= 1]
 prob = cp.Problem(obj, cons)
-layer = cpth.CvxpyLayer(prob, params=[p, A, z], out=[x])
+layer = CvxpyLayer(prob, params=[p, A, z], out=[x])
 \end{lstlisting}
 
 \begin{figure}[t]
