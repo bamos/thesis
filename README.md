@@ -15,6 +15,8 @@ This repository contains the full source code and data to produce
   so it doesn't get too messy.
   This uses the configuration in
   [refs.conf](https://github.com/bamos/thesis/blob/master/refs.conf).
++ I use [update-pdf.sh](https://github.com/bamos/thesis/blob/master/update-pdf.sh)
+  to keep the latest PDF only in the master branch.
 
 The BibTeX for this document is:
 
