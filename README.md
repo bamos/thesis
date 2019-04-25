@@ -2,17 +2,6 @@
 
 This repository contains the full source code and data to produce
 [my thesis document](https://github.com/bamos/thesis/blob/master/bamos_thesis.pdf).
-The BibTeX for this document is:
-
-```
-@phdthesis{amos2019differentiable,
-  author       = {Brandon Amos},
-  title        = {{Differentiable Optimization-Based Modeling for Machine Learning}},
-  school       = {Carnegie Mellon University},
-  year         = 2019,
-  month        = 5,
-}
-```
 
 + This repository started from
   [Cyrus Omar's thesis code](https://github.com/cyrus-/thesis),
@@ -26,3 +15,15 @@ The BibTeX for this document is:
   so it doesn't get too messy.
   This uses the configuration in
   [refs.conf](https://github.com/bamos/thesis/blob/master/refs.conf).
+
+The BibTeX for this document is:
+
+```
+@phdthesis{amos2019differentiable,
+  author       = {Brandon Amos},
+  title        = {{Differentiable Optimization-Based Modeling for Machine Learning}},
+  school       = {Carnegie Mellon University},
+  year         = 2019,
+  month        = 5,
+}
+```
