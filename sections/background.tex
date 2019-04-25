@@ -343,10 +343,13 @@ to obtain derivatives of implicitly defined functions.
 In this section we note how the commonly used ReLU, sigmoid, and softmax
 functions can be interpreted as explicit closed-form solutions
 to constrained convex optimization (argmin) problems.
+\citet{bibi2018deep} presents another view that interprets other
+layers as proximal operators and stochastic solvers.
 We use these as examples to further highlight the power of
 optimization-based inference, not to provide a new analysis
-of these layers.
-In this thesis, we propose new optimization-based inference
+of these layers. The main focus of this thesis is \emph{not}
+on learning and re-discovering existing activation functions.
+In this thesis, we rather propose new optimization-based inference
 layers that do \emph{not} have explicit closed-form solutions
 like these examples and show that they can still be efficiently
 turned into differentiable building blocks for end-to-end architectures.

@@ -559,51 +559,85 @@ and the dense solvers are also useful for dense cone programs,
 which come up in the context of differentiable optimization
 layers when large portions of the constraints are being learned.
 
+\newpage
 \section{Examples}
+\label{sec:cvxpyth:examples}
+
+This section provides example use cases of our \cvxpy
+optimization layer. All of these use the preamble
+
+\begin{lstlisting}
+import cvxpy as cp
+from cvxpyth import CvxpyLayer
+\end{lstlisting}
+
 \subsection{The ReLU, sigmoid, and softmax}
-This section revisits the optimization views of the ReLU,
-sigmoid, and softmax from \cref{sec:bg:existing} and shows how
-they can be implemented with our cvxpy layer.
+We will start with basic examples and revisit the optimization
+views of the ReLU, sigmoid, and softmax from \cref{sec:bg:existing}.
+These can be implemented with our \cvxpy layer
+in a few lines of code.
 
 \textbf{The ReLU.}
+Recall from \cref{eq:relu-proj} that the optimization view is
+\begin{equation*}
+  f(x) = \argmin_y \;\; \frac{1}{2}||x-y||_2^2 \;\; \st \;\; y\geq 0.
+\end{equation*}
+We can implement this layer with:
 \begin{lstlisting}
-_x = cp.Parameter(n)
-_y = cp.Variable(n)
-obj = cp.Minimize(cp.sum_squares(_y-_x))
-cons = [_y >= 0]
+x = cp.Parameter(n)
+y = cp.Variable(n)
+obj = cp.Minimize(cp.sum_squares(y-x))
+cons = [y >= 0]
 prob = cp.Problem(obj, cons)
-layer = CvxpyLayer(prob, params=[_x], out_vars=[_y])
+layer = CvxpyLayer(prob, params=[x], out_vars=[y])
 \end{lstlisting}
+
+This layer can be used and differentiated through
+just as any other PyTorch layer.
+Here is the output and derivative for a single
+dimension, illustrating that this is indeed performing
+the same operation as the ReLU.
 
 \includegraphics[height=2in]{fs/output_2.pdf}
 \includegraphics[height=2in]{fs/output_3.pdf}
 
+\newpage
 \textbf{The sigmoid.}
+Recall from \cref{eq:sigmoid-proj} that the optimization view is
+\begin{equation*}
+f(x) = \argmin_{0<y<1} \;\; -x^\top y -H_b(y).
+\end{equation*}
+We can implement this layer with:
 \begin{lstlisting}
-_x = cp.Parameter(n)
-_y = cp.Variable(n)
-obj = cp.Minimize(-_x.T*_y - cp.sum(cp.entr(_y) + cp.entr(1.-_y)))
+x = cp.Parameter(n)
+y = cp.Variable(n)
+obj = cp.Minimize(-x.T*y - cp.sum(cp.entr(y) + cp.entr(1.-y)))
 prob = cp.Problem(obj)
-layer = CvxpyLayer(prob, params=[_x], out_vars=[_y])
+layer = CvxpyLayer(prob, params=[x], out_vars=[y])
 \end{lstlisting}
+We can also check that the output and derivative matches
+what we expect from the usual sigmoid function:
 
 \includegraphics[height=2in]{fs/output_6.pdf}
 \includegraphics[height=2in]{fs/output_7.pdf}
 
-\newpage
 \textbf{The softmax.}
+Lastly recall from \cref{eq:simplex-proj} that the optimization view is
+\begin{equation*}
+f(x) = \argmin_{0<y<1} \;\; -x^\top y - H(y) \;\; \st\;\; 1^\top y = 1
+\end{equation*}
+We can implement this layer with:
 \begin{lstlisting}
-_x = cp.Parameter(d)
-_y = cp.Variable(d)
-obj = cp.Minimize(-_x.T*_y - cp.sum(cp.entr(_y)))
-cons = [sum(_y) == 1.]
+x = cp.Parameter(d)
+y = cp.Variable(d)
+obj = cp.Minimize(-x.T*y - cp.sum(cp.entr(y)))
+cons = [sum(y) == 1.]
 prob = cp.Problem(obj, cons)
-layer = CvxpyLayer(prob, params=[_x], out_vars=[_y])
+layer = CvxpyLayer(prob, params=[x], out_vars=[y])
 \end{lstlisting}
 
-\label{sec:cvxpyth:examples}
+\newpage
 \subsection{The OptNet QP}
-
 We can re-implement the OptNet QP layer from \cref{sec:optnet}
 with our differentiable \cvxpy{} layer in a few lines of code.
 The OptNet layer is represented as a convex quadratic program
@@ -624,11 +658,9 @@ $A\in \mathbb{R}^{m \times n}$,
 $b \in \mathbb{R}^m$,
 $G \in \mathbb{R}^ {p \times n}$ and
 $h \in \mathbb{R}^{p}$ are problem data.
-The \cvxpy{} implementation of this optimization problem is
+We can implement this with:
 
 \begin{lstlisting}
-import cvxpy as cp
-
 Q = cp.Parameter((n, n), PSD=True)
 p = cp.Parameter(n)
 A = cp.Parameter((m, n))
@@ -639,23 +671,12 @@ x = cp.Variable(n)
 obj = cp.Minimize(0.5*cp.quad_form(x, Q) + p.T * x)
 cons = [A*x == b, G*x <= h]
 prob = cp.Problem(obj, cons)
-\end{lstlisting}
-
-Our library allows the \cvxpy{} problem to be turned into
-a layer with a single line of code.
-\begin{lstlisting}
-import cvxpyth
-
-params = [Q, p, A, b, G, h]
-out = [x]
-layer = cvxpyth.CvxpyLayer(prob, params, out)
+layer = CvxpyLayer(prob, params=[Q, p, A, b, G, h], out=[x])
 \end{lstlisting}
 
 This layer can then be used by passing in the
 relevant parameter values:
 \begin{lstlisting}
-import torch
-
 Lval = torch.randn(nx, nx, requires_grad=True)
 Qval = Lval.t().mm(Lval)
 pval = torch.randn(nx, requires_grad=True)
@@ -666,25 +687,35 @@ hval = torch.randn(ncon_ineq, requires_grad=True)
 y = layer(Qval, pval, Aval, bval, Gval, hval)
 \end{lstlisting}
 
-\subsection{Ellipsoidally Constrained Problem}
+\newpage
+\subsection{Learning Polyhedral Constraints}
 We demonstrate how gradient-based learning can be done with
 a \cvxpy layer in this synthetic example.
-Consider the ellipsoidally constrained
+Consider the polyhedrally constrained
 projection problem
 \begin{align*}
 \hat y = \argmin_y\;\; &\frac{1}{2}||p-y||_2^2  \\
- {\rm s.t.}\;\; & \frac{1}{2}(y-z)^\top A(y-z) \leq 1
+ {\rm s.t.}\;\; & Gy\leq h \\
 \end{align*}
-Suppose we don't know the ellipsoid parameters $\theta=\{A,z\}$
+Suppose we don't know the polyhedral parameters $\theta=\{G, h\}$
 and want to learn them from data.
 Then using the MSE for $\ell$, we can randomly initialize
 ellipsoids $\theta$ and learn them with gradient steps $\nabla_\theta \ell$.
-This is an interesting optimization problem to consider because
-it is an example of doing learning with a non-polyhedral cone
-program (a SOCP), which prior approaches such as OptNet
-could not easily handle.
+We note that this problem is meant for illustrative purposes and
+could be solved by taking the convex hull of the input data points.
+However our approach would still work if this was over a latent
+and unobserved part of the model, of if you want to take an
+approximate convex hull that limits the number of polytope edges.
 
-We implement this layer with:
+We can implement this layer with the following code.
+\cref{fig:polyhedral-results} shows the results of learning
+on two examples.
+Each problem has a true known polytope that we show in blue
+and the model's approximation is in red.
+Learning starts on the left with randomly initialized
+polytopes that are updated with gradient steps,
+which are shown in the images progressing to the right.
+
 \begin{lstlisting}
 import cvxpy as cp
 import cvxpyth as cpth
@@ -696,30 +727,71 @@ x = cp.Variable(n)
 obj = cp.Minimize(0.5*cp.sum_squares(x-p))
 cons = [0.5*cp.quad_form(x-z, A) <= 1]
 prob = cp.Problem(obj, cons)
-params = [p, A, z]
-out = [x]
-layer = cpth.CvxpyLayer(prob, params, out)
+layer = cpth.CvxpyLayer(prob, params=[p, A, z], out=[x])
 \end{lstlisting}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.6\textwidth]{ellipsoid-frames.png}
+  \includegraphics[width=0.6\textwidth]{polytope-frames.png} \\
+  \cblock{190}{201}{216} True Polytope \enskip
+  \cblock{176}{128}{131} Approximate Polytope
   \caption{
-    Qualitative results of learning ellipsoidally constrained
-    optimization layers.
+    Learning polyhedrally constrained problems.
   }
-  \label{fig:ellipsoid-results}
+  \label{fig:polyhedral-results}
 \end{figure}
 
-\cref{fig:ellipsoid-results} shows our empirical results of
-learning ellipsoids and visualizes the learning process for
-four examples.
-Each problem has a true known ellipsoid that we show in blue
+\newpage
+\subsection{Learning Ellipsoidal Constraints}
+In addition to learning polyhedral constraints, we can easily
+learn any parameterized convex constraint set.
+Suppose instead that we want to learn an ellipsoidal
+projection of the form
+\begin{align*}
+\hat y = \argmin_y\;\; &\frac{1}{2}||p-y||_2^2  \\
+ {\rm s.t.}\;\; & \frac{1}{2}(y-z)^\top A(y-z) \leq 1
+\end{align*}
+with ellipsoid parameters $\theta=\{A,z\}$
+This is an interesting optimization problem to consider because
+it is an example of doing learning with a non-polyhedral cone
+program (a SOCP), which prior approaches such as OptNet
+could not easily handle.
+
+We can implement this layer with the following code.
+\cref{fig:ellipsoid-results} visualizes the learning process
+on two examples.
+As before, each problem has a true known ellipsoid that we show in blue
 and the model's approximation is in red.
 Learning starts on the left with randomly initialized
 ellipsoids that are updated with gradient steps,
 which are shown in the images progressing to the right.
 
+\begin{lstlisting}
+import cvxpy as cp
+import cvxpyth as cpth
+
+A = cp.Parameter((n, n), PSD=True)
+z = cp.Parameter(n)
+p = cp.Parameter(n)
+x = cp.Variable(n)
+obj = cp.Minimize(0.5*cp.sum_squares(x-p))
+cons = [0.5*cp.quad_form(x-z, A) <= 1]
+prob = cp.Problem(obj, cons)
+layer = cpth.CvxpyLayer(prob, params=[p, A, z], out=[x])
+\end{lstlisting}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.6\textwidth]{ellipsoid-frames.png} \\
+  \cblock{190}{201}{216} True Ellipsoid \enskip
+  \cblock{176}{128}{131} Approximate Ellipsoid
+  \caption{
+    Learning ellipsoidally constrained problems.
+  }
+  \label{fig:ellipsoid-results}
+\end{figure}
+
+\newpage
 \section{Evaluation}
 \label{sec:eval}
 
@@ -737,9 +809,9 @@ variables, 100 inequality constraints, and
 a minibatch size of 128 examples.
 We chose this task to understand how the performance
 of our \cvxpy{} layer compares to the \qpth implementation
-from \citet{amos2017optnet}, which we use as a baseline.
+from \cref{sec:optnet}, which we use as a baseline.
 The problem size we consider here is comparable
-to the QP problem sizes considered in \citet{amos2017optnet}.
+to the QP problem sizes considered in \cref{sec:optnet}.
 The backwards pass of \qpth is optimized to use a single
 batched, pre-factorized linear system solve.
 
