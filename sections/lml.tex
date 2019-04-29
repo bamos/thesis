@@ -83,9 +83,28 @@ The remainder of this section reviews related work on
 cardinality modeling, top-$k$ optimization,
 ranking-based loss functions, and scene graph generation.
 
-\subsection{Cardinality Modeling}
-TODO, discuss at least
-\cite{tarlow2012fast,globerson2016collective,brukhim2018predict}
+\subsection{Cardinality Potentials and Modeling}
+Cardinality potentials and modeling are a closely related line
+of work typically found in the structured prediction
+and constraint programming literature.
+\citet{regin1996generalized} shows how to add constraints to
+models for worker scheduling.
+\citet{tarlow2012fast,globerson2016collective} propose
+ways of performing structured prediction with cardinality
+potentials, and \citet{brukhim2018predict}
+propose a soft projection operation that integrate
+cardinality modeling into deep structured prediction
+architectures like SPENs \citep{belanger2015structured}.
+In contrast to all of these methods, our projection and
+constraint is exact and can be integrated in the standard
+forward pass of a deep model outside of structured prediction.
+None of our experiments use structured prediction techniques
+and we instead do standard supervised learning of vanilla
+feedforward models that use our LML layer.
+In contrast to \citet{brukhim2018predict}, we show that
+the backward pass of our soft projection can be exactly
+computed instead of unrolled as part of a structured
+prediction procedure.
 
 \subsection{Top-$k$ and Ranking-Based Loss Functions}
 \label{sec:lml:rw:topk}
@@ -202,7 +221,7 @@ all of the possible relationships between objects and
 select the top-scoring relationships
 \cite{xu2017scene,li2018factorizable,herzig2018mapping,woo2018linknet}.
 These methods include the near-state-of-the-art
-Neural Motifs model proposed in \citet{zellers2018neural}
+Neural Motifs model \citep{zellers2018neural}
 that generates a scene graph by creating object-
 and edge-level contexts.
 
@@ -887,7 +906,7 @@ both the Smooth SVM and LML layers.
 \label{sec:lml:cifar}
 
 We next evaluate the LML layer on the noisy top-5 CIFAR-100 task
-proposed in \citet{berrada2018smooth} that uses
+from \citet{berrada2018smooth} that uses
 the DenseNet 40-40 architecture \cite{huang2017densely}.
 The CIFAR-100 labels are
 organized into 20 ``coarse''
@@ -922,9 +941,8 @@ the methods evaluated for top-$k$ optimization
 provide nearly identical gradient information
 to the model and only have small differences.
 
-\newpage
 \subsection{Scene Graph Generation}
-\begin{figure*}[ht!]
+\begin{figure*}[!t]
   \centering
   \includegraphics[width=.45\textwidth]{{neural-motifs/train-recall-con}.pdf}
   \includegraphics[width=.45\textwidth]{{neural-motifs/val-recall-con}.pdf}
@@ -953,7 +971,7 @@ to the model and only have small differences.
   \label{fig:sg-training-cons}
 \end{figure*}
 
-\begin{table*}[ht!]
+\begin{table*}[!t]
 % \small
 \centering
 \footnotesize
@@ -1048,7 +1066,7 @@ model starts to overfit to and that constraining
 the model to only make a single prediction at each
 edge is a reasonable heuristic.
 
-\begin{figure*}[ht!]
+\begin{figure*}[!t]
   \centering
   \includegraphics[width=.45\textwidth]{{neural-motifs/train-recall-uncon}.pdf}
   \includegraphics[width=.45\textwidth]{{neural-motifs/val-recall-uncon}.pdf}
@@ -1076,7 +1094,7 @@ edge is a reasonable heuristic.
   }
   \label{fig:sg-training-uncon}
 \end{figure*}
-\begin{table*}[ht!]
+\begin{table*}[t!]
 % \small
 \footnotesize
 \centering

@@ -49,7 +49,7 @@ an impact.
   differentiable optimization as in \citet{donti2017task}.
 \item \textbf{Reinforcement learning and control.}
   \begin{itemize}
-  \item RL agents may be deployed in scenarios when
+  \item \textbf{Safety.} RL agents may be deployed in scenarios when
     the agent should avoid parts of the state space,
     \eg in safety-critical environments.
     Differentiable optimization layers can be used
@@ -57,15 +57,26 @@ an impact.
     regions are avoided.
     This is starting to be explored in
     \citet{dalal2018safe,pham2018optlayer}.
-  \item When RL environments involve physical systems,
+  \item \textbf{Differentiable control and planning.}
+    The differentiable MPC approach we presented in \cref{sec:empc}
+    is just one step towards a significantly broader vision
+    of integrating control and learning for doing imitation
+    or policy learning.
+  \item \textbf{Physics-based modeling.}
+    When RL environments involve physical systems,
     it may be useful to have a physics-based modeling.
     This can be done with a differentiable
     physics engines as in \citet{de2018end}.
-  \item Shaping the cost function of a
-    controller as in \citet{tamar2017learning}.
-  \item Differentiable control and planning:
-    \citet{chen2018optimal,chen2018approximating,karkus2018integrating}
-  \item Universal planning networks: \citet{srinivas2018universal}
+  \item \textbf{Inverse cost and reward learning.}
+    In many multi-agent control scenarios modeling agents
+    as controllers that are optimizing a control objective
+    is a powerful paradigm \citep{ng2000algorithms,finn2016guided}.
+    Differentiable controllers
+    are useful when trying to reconstruct an optimization
+    problem that other agents are solving.
+    This is done in the context of cost shaping in
+    \citet{tamar2017learning}.
+  % \item Universal planning networks: \citet{srinivas2018universal}
   \end{itemize}
 \item \textbf{Discrete, combinatorial, and submodular optimization.}
   The space of discrete, combinatorial, and mixed optimization problems

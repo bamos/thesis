@@ -3,33 +3,15 @@
 \chapter{Differentiable \cvxpy Optimization Layers}
 \label{sec:cvxpyth}
 
-% TODO: Make sure this is in the intro:
-%
-% We briefly discuss why this differentiable \cvxpy layer
-% adds significant modeling convenience for prototyping
-% optimization layers.
-% \begin{enumerate}
-% \item \cvxpy is a powerful prototyping tool on its own
-%   and is widely used in the optimization community because
-%   transforming problems to the standard form required by
-%   solvers is cumbersome and error-prone.
-%   To use the existing optimization layers,
-%   users needed to hand-implement a solver for their optimization problem
-%   or transform it to a standard to be used with
-%   libraries such as \verb!qpth!.
-%   Doing this transformation manually is feasible for small
-%   optimization problems but becomes a significant
-%   development bottleneck for more sophisticated
-%   problems and is something that \cvxpy handles automatically.
-% \item Implicitly differentiating the KKT conditions
-%   or fixed-point equations for optimization problems
-%   can be an involved process. For the same reasons
-%   why having \cvxpy is useful for the forward pass,
-%   our contribution provides a similarly convenient
-%   backward pass implementation than users no longer
-%   have to implement by hand.
-% \end{enumerate}
+In this chapter, we show how to turn the \cvxpy
+modeling language \citep{diamond2016cvxpy} into
+a differentiable optimization layer and
+implement our method in PyTorch \citep{paszke2017automatic}.
+This allows users to express convex optimization layers in
+the intuitive \cvxpy modeling language without needing
+to manually implement the backward pass.
 
+\section{Introduction}
 This thesis has presented differentiable optimization layers
 as a powerful class of operations for end-to-end learning
 that allow more specialized domain knowledge to be integrated
@@ -73,14 +55,6 @@ which is not capable of exploiting problem-specific
 structures, uses dense operations, and requires
 the user to manually transform their problem into
 a standard form.
-
-In this chapter, we show how to turn the \cvxpy
-modeling language \citep{diamond2016cvxpy} into
-a differentiable optimization layer and
-implement our method in PyTorch \citep{paszke2017automatic}.
-This allows users to express convex optimization layers in
-the intuitive \cvxpy modeling language without needing
-to manually implement the backward pass.
 
 We make \cvxpy differentiable with respect to the
 \texttt{Parameter} objects provided to the optimization problem
@@ -345,12 +319,10 @@ which can be re-written as
 We have created a differentiable \cvxpy layer
 by making the relevant components differentiable,
 which we visually show in \cref{fig:overview}.
-We advocate for making the transformation from the
-problem data in the original form to the problem data of
-the canonicalized cone problem differentiable
-by replacing the numpy operations for this component
-with an autodiff framework such as PyTorch \citep{paszke2017automatic}
-or TensorFlow \citep{abadi2016tensorflow}.
+We make the transformation from the problem data in the original
+form to the problem data of the canonicalized cone problem
+differentiable by replacing the numpy operations for this component
+with PyTorch \citep{paszke2017automatic} operations.
 We then pass this data into a differentiable cone program
 solver, which we show how to create in \cref{sec:diff-cp}
 by implicitly differentiating the residual map of
@@ -421,9 +393,9 @@ and non-negative orthant.
 
 The linear system in \cref{eq:residual-implicit-diff}
 can be expensive to solve.
-In special cases such as quadratic programs
-that we discussed in \cref{sec:optnet}
-and LQR \cref{sec:empc}, this system can be interpreted
+In special cases such as quadratic programs and LQR problems
+that we discussed in \cref{sec:optnet} and
+\cref{sec:empc}, respectively, this system can be interpreted
 as the solution to another convex optimization problem
 and efficiently solved with a method similar to the
 forward pass.
@@ -435,48 +407,9 @@ to interpret this linear system as a KKT system
 because of the cone projections and therefore it
 is more difficult to interpret this linear system
 solve as an optimization problem.
-Following the method of \citet{busseti2018solution},
-we advocate for solving the linear system for general
-cone programs with LSQR \citep{paige1982lsqr}.
 
-\textbf{Efficiently backpropagating through cone programs.}
-When using cone programs as layers in end-to-end learning systems
-with some scalar-valued loss function $\ell$,
-the full Jacobian $\DD_\theta \xstar$ is expensive
-and unnecessary to form and requires solving
-$|\theta|$ linear systems.
-The Jacobian is only used when applying the chain rule
-to obtain $\DD_\theta \ell = (\DD_\xstar\ell) \DD_\theta \xstar$.
-We can directly compute $\DD_\theta \ell$ without computing
-the intermediate Jacobian by solving a single linear system.
-Following the method of \cref{sec:optnet}, we set up the system
-\begin{equation}
-  \DD_z \Res(\zstar)
-\begin{bmatrix}
-  d_{z_1} \\
-  d_{z_2} \\
-  0 \\
-\end{bmatrix} = \\
--
-\begin{bmatrix}
-  \nabla_\xstar \ell \\
-  0 \\
-  0 \\
-\end{bmatrix}.
-\end{equation}
-Applying the chain rule to $\ustar=\Pi \zstar$ gives
-$d_x = d_{z_1}$ and
-$d_y = (\DD_z \Pi z) d_{z_2}$.
-We then compute the relevant backpropagation derivatives as
-\begin{equation}
-  \nabla_c \ell = d_x
-  \hspace{20mm}
-  \nabla_A \ell = d_y \otimes \xstar + \ystar \otimes d_x
-  \hspace{20mm}
-  \nabla_b \ell = -d_y
-\end{equation}
-
-\section{Forward Pass: Efficiently solving batches of
+\section{Implementation}
+\subsection{Forward Pass: Efficiently solving batches of
   cone programs with SCS and PyTorch}
 \label{sec:cp:efficient}
 
@@ -558,6 +491,57 @@ that the sparse linear system solvers may not recognize automatically,
 and the dense solvers are also useful for dense cone programs,
 which come up in the context of differentiable optimization
 layers when large portions of the constraints are being learned.
+
+\subsection{Backward pass: Efficiently solving the linear system}
+When using cone programs as layers in end-to-end learning systems
+with some scalar-valued loss function $\ell$,
+the full Jacobian $\DD_\theta \xstar$ is expensive
+and unnecessary to form and requires solving
+$|\theta|$ linear systems.
+The Jacobian is only used when applying the chain rule
+to obtain $\DD_\theta \ell = (\DD_\xstar\ell) \DD_\theta \xstar$.
+We can directly compute $\DD_\theta \ell$ without computing
+the intermediate Jacobian by solving a single linear system.
+Following the method of \cref{sec:optnet}, we set up the system
+\begin{equation}
+  \label{eq:cvxpyth:diff_efficient}
+  \DD_z \Res(\zstar)
+\begin{bmatrix}
+  d_{z_1} \\
+  d_{z_2} \\
+  0 \\
+\end{bmatrix} = \\
+-
+\begin{bmatrix}
+  \nabla_\xstar \ell \\
+  0 \\
+  0 \\
+\end{bmatrix}.
+\end{equation}
+Applying the chain rule to $\ustar=\Pi \zstar$ gives
+$d_x = d_{z_1}$ and
+$d_y = (\DD_z \Pi z) d_{z_2}$.
+We then compute the relevant backpropagation derivatives as
+\begin{equation}
+  \nabla_c \ell = d_x
+  \hspace{20mm}
+  \nabla_A \ell = d_y \otimes \xstar + \ystar \otimes d_x
+  \hspace{20mm}
+  \nabla_b \ell = -d_y
+\end{equation}
+
+Solving \cref{eq:cvxpyth:diff_efficient} is still challenging
+to implement in practice as $\DD_z \Res(\zstar)$ can be large
+and sparse and doesn't have obviously exploitable properties such
+as symmetry or anti-symmetry.
+In addition to directly solving this linear system, we
+also explore the use of LSQR \citep{paige1982lsqr} as an
+iterative indirect method of solving this system
+in \cref{sec:cvxpyth:bw_prof}.
+Our LSQR implementation uses the implementation from
+\citet{ali2017semismooth} to compute $\DD_z \Pi(z)$
+in the form of an abstract linear operator so the
+full matrix does not need to be explicitly formed.
 
 \newpage
 \section{Examples}
@@ -736,7 +720,7 @@ layer = CvxpyLayer(prob, params=[p, A, z], out=[x])
   \cblock{190}{201}{216} True Polytope \enskip
   \cblock{176}{128}{131} Approximate Polytope
   \caption{
-    Learning polytope constrained problems.
+    Learning polyhedrally constrained problems.
   }
   \label{fig:polytope-results}
 \end{figure}
@@ -809,7 +793,7 @@ variables, 100 inequality constraints, and
 a minibatch size of 128 examples.
 We chose this task to understand how the performance
 of our \cvxpy{} layer compares to the \qpth implementation
-from \cref{sec:optnet}, which we use as a baseline.
+from \cref{sec:optnet}, which we use as a comparison point.
 The problem size we consider here is comparable
 to the QP problem sizes considered in \cref{sec:optnet}.
 The backwards pass of \qpth is optimized to use a single
@@ -823,7 +807,7 @@ Our default experiment uses a QP with 100 latent
 variables and a minibatch size of 128 examples.
 We chose this task to study the impacts of
 sparsity on the runtime.
-We again use \qpth as the baseline for these experiments.
+We again use \qpth as the comparison point for these experiments.
 
 \paragraph{Task 3: Linear Quadratic Regulator (LQR).}
 We consider a continuous-state-action, discrete-time, finite-horizon
@@ -844,7 +828,7 @@ and $\{F_t, f_t\}$ parameterize an affine system
 transition dynamics.
 We consider a control problem with 10 states,
 2 actions, and a horizon of 5.
-As a baseline we compare to the differentiable model
+We compare to the differentiable model
 predictive control (MPC) solver from
 \citep{amos2018differentiable}, which uses batched
 PyTorch operations to solve a batch of LQR problems with
@@ -854,7 +838,7 @@ the Riccati equations.
 
 For each of these tasks we have measured the forward
 and backward pass execution times for our layer in
-comparison to the baseline implementations.
+comparison to the specialized solvers.
 We have run these experiments on an unloaded system with
 an NVIDIA GeForce GTX 1080 Ti GPU and
 a four-core 2.60GHz Intel Xeon E5-2623 CPUs hyper-threaded
@@ -865,10 +849,13 @@ our implementations and baselines.
 For \qpth and our implementation, we use an iteration
 stopping condition of $\epsilon=10^{-3}$.
 
+\newpage
+\subsection{Forward pass profiling}
 \cref{fig:eval:fwd} summarizes our main forward pass execution
 times. \cref{fig:eval:fwd:all} shows the runtimes of all of the
 modes and batch sizes, and \cref{fig:eval:fwd:speedups}
-illustrates the speedup of our best mode compared to the baseline.
+illustrates the speedup of our best mode compared to the
+specialized solvers.
 We have implemented and run every mode from \cref{sec:cp:efficient}
 and our summary presents the best-performing mode,
 which in every case on the GPU is our block direct solver.
@@ -881,35 +868,32 @@ acceleration, convergence, and normalization
 tricks in SCS that are not present in \qpth.
 The LQR task presents a sparse problem that illustrates
 the challenges to using a general cone program formulation.
-Our batched Riccati equation baseline efficiently exploits
-the sparsity pattern of the problem that is extremely
-difficult for the general cone program formulation we
-consider here to take advantage of.
+Our specialized solver that solves the Riccati equations in
+batched form exploits the sparsity pattern of the problem
+that is extremely difficult for the general cone program
+formulation we consider here to take advantage of.
 If the correct mappings to the cone program exist,
 our layer could be modified to accept an
 optimized user-provided solver for the forward pass
 so that users can still take advantage of our backward
 pass implementation.
 
-% \todon{Backward pass profiling}
-
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\textwidth]{prof/forward-summary.pdf} \\
-  \cblock{128}{128}{128} Baseline \enskip
+  \cblock{128}{128}{128} Specialized Solver \enskip
   \cblock{208}{46}{47} PyTorch Block Direct \enskip
   \cblock{86}{165}{84} SCS Serial Direct
   \caption{
     Forward pass execution times.
     For each task we run ten trials
     on an unloaded system and normalize the runtimes to the
-    CPU execution time of the baseline.
+    CPU execution time of the specialized solver.
     The bars show the 95\% confidence interval.
     For our method, we show the best performing mode.
   }
   \label{fig:eval:fwd}
 \end{figure}
-
 
 \begin{figure}[!h]
   \centering
@@ -917,15 +901,13 @@ pass implementation.
   \includegraphics[width=0.9\textwidth]{prof/CUDA-forward-speedups.pdf}
 
   \cblock{208}{46}{47} PyTorch Block Direct \enskip
-  \cblock{68}{125}{171} PyTorch Block Indirect \enskip
   \cblock{86}{165}{84} SCS Serial Direct \enskip
-  \cblock{146}{86}{155} SCS Serial Indirect \\
-  \cblock{230}{127}{25} SCS Block Direct \enskip
-  \cblock{235}{235}{71} SCS Block Indirect
+  \cblock{230}{127}{25} SCS Block Direct
 
   \caption{
     Forward pass execution time speedups of our best
-    performing method in comparison to the baseline execution time.
+    performing method in comparison to the specialized
+    solver's execution time.
     For each task we run ten trials on an unloaded system.
     The bars show the 95\% confidence interval.
   }
@@ -938,10 +920,10 @@ pass implementation.
   \includegraphics[width=0.9\textwidth]{prof/prof_qp_box-forward.pdf}
   \includegraphics[width=0.9\textwidth]{prof/prof_mpc-forward.pdf}
 
-  \cblock{128}{128}{128} Baseline \enskip
+  \cblock{128}{128}{128} Specialized Solver \enskip
   \cblock{208}{46}{47} PyTorch Block Direct \enskip
-  \cblock{68}{125}{171} PyTorch Block Indirect \enskip
-  \cblock{86}{165}{84} SCS Serial Direct \\
+  \cblock{68}{125}{171} PyTorch Block Indirect \\
+  \cblock{86}{165}{84} SCS Serial Direct \enskip
   \cblock{146}{86}{155} SCS Serial Indirect \enskip
   \cblock{230}{127}{25} SCS Block Direct \enskip
   \cblock{235}{235}{71} SCS Block Indirect
@@ -952,6 +934,120 @@ pass implementation.
   }
   \label{fig:eval:fwd:all}
 \end{figure}
+
+\newpage~\newpage~\newpage
+\subsection{Backward pass profiling}
+\label{sec:cvxpyth:bw_prof}
+In this section we compare the backward pass times of
+our layer in comparison to the specialized solvers
+on the same three tasks as before: the dense QP,
+the box QP, and LQR.
+We show that differentiating through our conic
+solver is competitive in comparison to the
+specialized solver.
+As a comparison point, the \qpth solver exploits
+the property that the linear system for the backward pass is the
+same as the linear system in the forward pass and can therefore
+do the backward pass with a single pre-factorized solve.
+The LQR solver exploits the property that the backward
+pass for LQR can be interpreted as another LQR problem that
+can efficiently be solved with the Riccati recursion.
+
+These comparisons are important because the linear system for
+differentiating cone programs in \cref{eq:cvxpyth:diff_efficient}
+is a more general form and cannot leverage the same exploits
+as the specialized solvers.
+To get an intuition of what these linear systems look like on
+our tasks, we plot sample maps on smaller problems of the
+coefficient matrix in \cref{fig:cvxpyth:sample_maps}.
+This illustrates the sparsity that is typically present in the
+linear system that needs to be solved, but also illustrates
+that beyond sparsity, there is no other common property that
+can be exploited between the tasks.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[height=2.0in]{Ms_qpth_dense.pdf}
+  \includegraphics[height=2.0in]{Ms_qpth_box.pdf}
+  \includegraphics[height=2.0in]{Ms_MPC.pdf}
+  \caption{Sample linear system coefficients for
+    the backward pass system in \cref{eq:cvxpyth:diff_efficient}
+    on smaller versions of the tasks we consider.
+    The tasks we consider are approximately five
+    times larger than these systems.
+  }
+  \label{fig:cvxpyth:sample_maps}
+\end{figure}
+
+To understand how many LSQR iterations are necessary
+to solve our task, we compare the approximate derivatives computed
+by LSQR to the derivatives obtained by directly solving
+the linear system in \cref{fig:cvxpyth:lsqr_conv}.
+This shows that typically 500-1000 LSQR iterations
+are necessary for the tasks that we consider.
+In some cases such as $\partial x^\star / \partial A$
+for LQR, the approximate gradient computed by LSQR does
+never converges exactly to the true gradient.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.9\textwidth]{lsqr_dense_qp.pdf}
+  \includegraphics[width=0.9\textwidth]{lsqr_box_qp.pdf}
+  \includegraphics[width=0.9\textwidth]{lsqr_mpc.pdf}
+
+  \cblock{68}{125}{171} $\partial x^\star/\partial A$ \enskip
+  \cblock{208}{46}{47} $\partial x^\star / \partial b$ \enskip
+  \cblock{146}{86}{155} $\partial x^\star / \partial c$
+  \caption{LSQR convergence for the backward pass systems.
+    The shaded areas show the 95\% confidence interval
+    across ten problem instances.
+  }
+  \label{fig:cvxpyth:lsqr_conv}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.9\textwidth]{prof/prof_qp_dense-backward.pdf}
+  \includegraphics[width=0.9\textwidth]{prof/prof_qp_box-backward.pdf}
+  \includegraphics[width=0.9\textwidth]{prof/prof_mpc-backward.pdf}
+
+  \cblock{128}{128}{128} Specialized Solver \enskip
+  \cblock{208}{46}{47} Direct (Dense) \enskip
+  LSQR
+  (\cblock{68}{125}{171} 100 \cblock{86}{165}{84} 500 \cblock{146}{86}{155} 1000)
+  Iterations
+  \caption{
+    Backward pass execution times.
+    For each task we run ten trials on an unloaded system.
+    The bars show the 95\% confidence interval.
+  }
+  \label{fig:cvxpyth:bw}
+\end{figure}
+
+\newpage~\newpage~\newpage
+\cref{fig:cvxpyth:bw} compares our backward pass times to
+the specialized solvers for the QP and LQR tasks.
+This shows that there is a slight computational overhead
+in comparison to the specialized solvers, but that
+solving the linear system is still tractable for these tasks.
+The LSQR runtime is serialized across the batch, and is
+currently only implemented on the CPU.
+We emphasize that if the backward pass time becomes a bottleneck,
+the runtime can be further improved by further exploiting the
+sparsity by investigating other direct and indirect solvers
+for the systems, or by exploiting the property that we mentioned
+earlier in \cref{sec:diff-cp} that for simple cones like the
+free and non-negative cones, parts of the system become the same as
+parts of the KKT system.
+
+\section{Conclusion}
+This section has presented a way of differentiating through
+cone programs that enabled us to create a powerful prototyping
+tool for differentiable convex optimization layers.
+Practitioners can use this library in place of hand-implementing
+a solver and implicitly differentiating the KKT conditions.
+The speed of our tool is competitive with the speed of specialized
+solvers, even in the batched setting required for machine learning.
 
 %%% Local Variables:
 %%% coding: utf-8
