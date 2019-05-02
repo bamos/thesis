@@ -87,24 +87,24 @@ The experimental source code and libraries produced for this
 thesis are freely available as open source software and
 are available in the following repositories.
 
-+ https://github.com/locuslab/icnn:
-  TensorFlow experiments for input-convex neural networks.
-+ https://locuslab.github.io/qpth/:
-  A stand-alone PyTorch library for the OptNet QP layers.
-+ https://github.com/locuslab/optnet:
-  PyTorch experiments for OptNet.
-+ https://locuslab.github.io/mpc.pytorch:
++ [[locuslab/mpc.pytorch](https://locuslab.github.io/mpc.pytorch)]
   A stand-alone PyTorch library for the differentiable
   model predictive control approach.
-+ https://github.com/locuslab/differentiable-mpc:
++ [[locuslab/differentiable-mpc](https://github.com/locuslab/differentiable-mpc)]
   PyTorch experiments for the differentiable MPC work.
-+ https://github.com/bamos/block:
-  An intelligent block matrix library for numpy, PyTorch, and beyond.
-+ https://github.com/bamos/dcgan-completion.tensorflow:
-  Image Completion with Deep Learning in TensorFlow.
-+ https://github.com/cmusatyalab/openface:
++ [[locuslab/qpth](https://locuslab.github.io/qpth/)]:
+  A stand-alone PyTorch library for the OptNet QP layers.
++ [[locuslab/optnet](https://github.com/locuslab/optnet)]
+  PyTorch experiments for OptNet.
++ [[locuslab/icnn](https://github.com/locuslab/icnn)]
+  TensorFlow experiments for input-convex neural networks.
++ [[cmusatyalab/openface](https://cmusatyalab.github.io/openface)]
   Face recognition with deep neural networks.
-+ https://github.com/bamos/densenet.pytorch:
++ [[bamos/block](https://github.com/bamos/block)]
+  An intelligent block matrix library for numpy, PyTorch, and beyond.
++ [[bamos/dcgan-completion.tensorflow](https://github.com/bamos/dcgan-completion.tensorflow)]
+  Image Completion with Deep Learning in TensorFlow.
++ [[bamos/densenet.pytorch](https://github.com/bamos/densenet.pytorch)]
   A PyTorch implementation of DenseNet.
 
 ------
