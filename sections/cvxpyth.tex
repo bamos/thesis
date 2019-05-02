@@ -701,17 +701,14 @@ polytopes that are updated with gradient steps,
 which are shown in the images progressing to the right.
 
 \begin{lstlisting}
-import cvxpy as cp
-import cvxpyth as cpth
-
-A = cp.Parameter((n, n), PSD=True)
-z = cp.Parameter(n)
+G = cp.Parameter((m, n))
+h = cp.Parameter(m)
 p = cp.Parameter(n)
-x = cp.Variable(n)
-obj = cp.Minimize(0.5*cp.sum_squares(x-p))
-cons = [0.5*cp.quad_form(x-z, A) <= 1]
+y = cp.Variable(n)
+obj = cp.Minimize(0.5*cp.sum_squares(y-p))
+cons = [G*y <= h]
 prob = cp.Problem(obj, cons)
-layer = CvxpyLayer(prob, params=[p, A, z], out=[x])
+layer = CvxpyLayer(prob, params=[p, G, h], out=[y])
 \end{lstlisting}
 
 \begin{figure}[t]
@@ -751,17 +748,14 @@ ellipsoids that are updated with gradient steps,
 which are shown in the images progressing to the right.
 
 \begin{lstlisting}
-import cvxpy as cp
-import cvxpyth as cpth
-
 A = cp.Parameter((n, n), PSD=True)
 z = cp.Parameter(n)
 p = cp.Parameter(n)
-x = cp.Variable(n)
-obj = cp.Minimize(0.5*cp.sum_squares(x-p))
-cons = [0.5*cp.quad_form(x-z, A) <= 1]
+y = cp.Variable(n)
+obj = cp.Minimize(0.5*cp.sum_squares(y-p))
+cons = [0.5*cp.quad_form(y-z, A) <= 1]
 prob = cp.Problem(obj, cons)
-layer = CvxpyLayer(prob, params=[p, A, z], out=[x])
+layer = CvxpyLayer(prob, params=[p, A, z], out=[y])
 \end{lstlisting}
 
 \begin{figure}[t]

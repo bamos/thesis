@@ -1,7 +1,34 @@
 # Differentiable Optimization-Based Modeling for Machine Learning
 
-This repository contains the full source code and data to produce
+This repository is by [Brandon Amos](http://bamos.github.io)
+and contains the full source code and data to produce
 [my thesis document](https://github.com/bamos/thesis/blob/master/bamos_thesis.pdf).
+
+The experimental source code and libraries produced for this
+thesis are freely available as open source software and
+are available in the following repositories.
+
++ https://github.com/locuslab/icnn:
+  TensorFlow experiments for input-convex neural networks.
++ https://locuslab.github.io/qpth/:
+  A stand-alone PyTorch library for the OptNet QP layers.
++ https://github.com/locuslab/optnet:
+  PyTorch experiments for OptNet.
++ https://locuslab.github.io/mpc.pytorch:
+  A stand-alone PyTorch library for the differentiable
+  model predictive control approach.
++ https://github.com/locuslab/differentiable-mpc:
+  PyTorch experiments for the differentiable MPC work.
++ https://github.com/bamos/block:
+  An intelligent block matrix library for numpy, PyTorch, and beyond.
++ https://github.com/bamos/dcgan-completion.tensorflow:
+  Image Completion with Deep Learning in TensorFlow.
++ https://github.com/cmusatyalab/openface:
+  Face recognition with deep neural networks.
++ https://github.com/bamos/densenet.pytorch:
+  A PyTorch implementation of DenseNet.
+
+------
 
 + This repository started from
   [Cyrus Omar's thesis code](https://github.com/cyrus-/thesis),
@@ -18,6 +45,8 @@ This repository contains the full source code and data to produce
 + I use [update-pdf.sh](https://github.com/bamos/thesis/blob/master/update-pdf.sh)
   to keep the latest PDF only in HEAD, although Git LFS or a related
   project may be a better solution.
+
+------
 
 The BibTeX for this document is:
 

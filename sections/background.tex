@@ -84,8 +84,9 @@ structured prediction methods like conditional random fields as the
 ``last layer'' of a deep network architecture
 \citep{peng2009conditional,zheng2015conditional,chen2015learning}
 as well as in deeper energy-based architectures
-\citep{belanger2016structured,belanger2017end,belanger2017deep},
-which we further discuss in \cref{sec:bg:spens}.
+\citep{belanger2016structured,belanger2017end,belanger2017deep,wang2016proximal}.
+We further discuss Structured Prediction Energy Networks (SPENs)
+in \cref{sec:bg:spens}.
 
 An ongoing discussion in the community argues whether
 adding the dependencies explicitly in an energy-based is useful or not.
@@ -216,6 +217,8 @@ generic classification and structured prediction tasks
 in vision for tasks such as denoising
 \citep{tappen2007learning,schmidt2014shrinkage}
 or edge-aware smoothing \citep{barron2016fast}.
+\citet{diamond2017unrolled} presents unrolled optimization
+with deep priors.
 \citet{metz2016unrolled} uses unrolled optimization within a network to
 stabilize the convergence of generative adversarial networks
 \citep{goodfellow2014generative}.
