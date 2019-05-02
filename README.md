@@ -4,8 +4,110 @@ This repository is by [Brandon Amos](http://bamos.github.io)
 and contains the full source code and data to produce
 [my thesis document](https://github.com/bamos/thesis/blob/master/bamos_thesis.pdf).
 
-<img src='https://raw.githubusercontent.com/bamos/thesis/master/cvxpyth/polytopes.gif'></img>
-<img src='https://raw.githubusercontent.com/bamos/thesis/master/cvxpyth/ellipsoids.gif'></img>
+<img src='https://raw.githubusercontent.com/bamos/thesis/master/cvxpyth/polytopes-ellipsoids.gif'></img>
+
+---
+
+<table class="table table-hover">
+
+<tr>
+<td class="col-md-3"><a href="https://arxiv.org/abs/1810.13400" target="_blank"><img src="images/publications/amos2018end.png" /></a> </td>
+<td>
+    <strong>Differentiable MPC for End-to-end Planning and Control</strong><br />
+    <strong>B. Amos</strong>, I. Rodriguez, J. Sacks, B. Boots, and J. Kolter<br />
+    NeurIPS 2018<br />
+    [1] 
+[<a href="javascript: none" onclick="$(&quot;#abs_amos2018end&quot;).toggle()">abs</a>] [<a href="https://arxiv.org/abs/1810.13400" target="_blank">pdf</a>]  [<a href="https://locuslab.github.io/mpc.pytorch/" target="_blank">code</a>] <br />
+</td>
+</tr>
+
+
+<tr>
+<td class="col-md-3"><a href="http://arxiv.org/abs/1805.08195" target="_blank"><img src="images/publications/brown2018depth.png" /></a> </td>
+<td>
+    <strong>Depth-Limited Solving for Imperfect-Information Games</strong><br />
+    N. Brown, T. Sandholm, and <strong>B. Amos</strong><br />
+    NeurIPS 2018<br />
+    
+    [2] 
+[<a href="javascript: none" onclick="$(&quot;#abs_brown2018depth&quot;).toggle()">abs</a>] [<a href="http://arxiv.org/abs/1805.08195" target="_blank">pdf</a>] <br />
+</td>
+</tr>
+
+
+<tr>
+<td class="col-md-3"><a href="https://openreview.net/forum?id=r1HhRfWRZ" target="_blank"><img src="images/publications/amos2018learning.png" /></a> </td>
+<td>
+    <strong>Learning Awareness Models</strong><br />
+    <strong>B. Amos</strong>, L. Dinh, S. Cabi, T. Roth&ouml;rl, S. Colmenarejo, A. Muldal, T. Erez, Y. Tassa, N. de Freitas, and M. Denil<br />
+    ICLR 2018<br />
+    
+    [3] 
+[<a href="javascript: none" onclick="$(&quot;#abs_amos2018learning&quot;).toggle()">abs</a>] [<a href="https://openreview.net/forum?id=r1HhRfWRZ" target="_blank">pdf</a>] <br />
+
+</td>
+</tr>
+
+
+<tr>
+<td class="col-md-3"><a href="http://arxiv.org/abs/1703.04529" target="_blank"><img src="images/publications/donti2017task.png" /></a> </td>
+<td>
+    <strong>Task-based End-to-end Model Learning</strong><br />
+    P. Donti, <strong>B. Amos</strong>, and J. Kolter<br />
+    NeurIPS 2017<br />
+    
+    [4] 
+[<a href="javascript: none" onclick="$(&quot;#abs_donti2017task&quot;).toggle()">abs</a>] [<a href="http://arxiv.org/abs/1703.04529" target="_blank">pdf</a>]  [<a href="https://github.com/locuslab/e2e-model-learning" target="_blank">code</a>] <br />
+
+</td>
+</tr>
+
+
+<tr>
+<td class="col-md-3"><a href="http://arxiv.org/abs/1703.00443" target="_blank"><img src="images/publications/amos2017optnet.png" /></a> </td>
+<td>
+    <strong>OptNet: Differentiable Optimization as a Layer in Neural Networks</strong><br />
+    <strong>B. Amos</strong> and J. Kolter<br />
+    ICML 2017<br />
+    
+    [5] 
+[<a href="javascript: none" onclick="$(&quot;#abs_amos2017optnet&quot;).toggle()">abs</a>] [<a href="http://arxiv.org/abs/1703.00443" target="_blank">pdf</a>]  [<a href="https://github.com/locuslab/optnet" target="_blank">code</a>] <br />
+</td>
+</tr>
+
+
+<tr>
+<td class="col-md-3"><a href="http://arxiv.org/abs/1609.07152" target="_blank"><img src="images/publications/amos2017input.png" /></a> </td>
+<td>
+    <strong>Input Convex Neural Networks</strong><br />
+    <strong>B. Amos</strong>, L. Xu, and J. Kolter<br />
+    ICML 2017<br />
+    
+    [6] 
+[<a href="javascript: none" onclick="$(&quot;#abs_amos2017input&quot;).toggle()">abs</a>] [<a href="http://arxiv.org/abs/1609.07152" target="_blank">pdf</a>]  [<a href="https://github.com/locuslab/icnn" target="_blank">code</a>] <br />
+</td>
+</tr>
+<tr>
+<td class="col-md-3"><a href="http://www.cs.cmu.edu/~hzhao1/papers/ICML2016/BL-SPN-main.pdf" target="_blank"><img src="images/publications/zhao2016collapsed.png" /></a> </td>
+<td>
+    <strong>Collapsed Variational Inference for Sum-Product Networks</strong><br />
+    H. Zhao, T. Adel, G. Gordon, and <strong>B. Amos</strong><br />
+    ICML 2016<br />
+    [7] 
+[<a href="javascript: none" onclick="$(&quot;#abs_zhao2016collapsed&quot;).toggle()">abs</a>] [<a href="http://www.cs.cmu.edu/~hzhao1/papers/ICML2016/BL-SPN-main.pdf" target="_blank">pdf</a>] <br />
+</td>
+</tr>
+<tr>
+<td class="col-md-3"><a href="http://reports-archive.adm.cs.cmu.edu/anon/anon/2016/CMU-CS-16-118.pdf" target="_blank"><img src="images/publications/amos2016openface.png" /></a> </td>
+<td>
+    <strong>OpenFace: A general-purpose face recognition library with mobile applications</strong><br />
+    <strong>B. Amos</strong>, B. Ludwiczuk, and M. Satyanarayanan<br />
+    CMU 2016<br />
+    [8] 
+[<a href="javascript: none" onclick="$(&quot;#abs_amos2016openface&quot;).toggle()">abs</a>] [<a href="http://reports-archive.adm.cs.cmu.edu/anon/anon/2016/CMU-CS-16-118.pdf" target="_blank">pdf</a>]  [<a href="https://cmusatyalab.github.io/openface" target="_blank">code</a>] <br />
+</td>
+</tr>
+</table>
 
 ---
 
