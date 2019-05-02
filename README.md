@@ -4,6 +4,11 @@ This repository is by [Brandon Amos](http://bamos.github.io)
 and contains the full source code and data to produce
 [my thesis document](https://github.com/bamos/thesis/blob/master/bamos_thesis.pdf).
 
+<img src='https://raw.githubusercontent.com/bamos/thesis/master/cvxpyth/polytopes.gif'></img>
+<img src='https://raw.githubusercontent.com/bamos/thesis/master/cvxpyth/ellipsoids.gif'></img>
+
+---
+
 The experimental source code and libraries produced for this
 thesis are freely available as open source software and
 are available in the following repositories.
