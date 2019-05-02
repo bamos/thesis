@@ -2,9 +2,9 @@
 
 + This repository is by [Brandon Amos](http://bamos.github.io)
   and contains the full source code and data to produce
-  [my thesis document](https://github.com/bamos/thesis/blob/master/bamos_thesis.pdf).
+  [my thesis document](https://github.com/bamos/thesis/raw/master/bamos_thesis.pdf).
 + The slides are available
-  [here](https://github.com/bamos/thesis/blob/master/slides.pdf).
+  [here](https://github.com/bamos/thesis/raw/master/slides.pdf).
 
 ---
 
