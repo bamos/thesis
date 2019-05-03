@@ -68,18 +68,34 @@ an impact.
     This can be done with a differentiable
     physics engines as in \citet{de2018end}.
   \item \textbf{Inverse cost and reward learning.}
-    In many multi-agent control scenarios modeling agents
-    as controllers that are optimizing a control objective
-    is a powerful paradigm \citep{ng2000algorithms,finn2016guided}.
-    TODO
+    Given observed trajectories in an imitation learning
+    setup, modeling agents as controllers that are
+    optimizing an objective is a powerful paradigm
+    \citep{ng2000algorithms,finn2016guided}.
     Differentiable controllers
     are useful when trying to reconstruct an optimization
     problem that other agents are solving.
     This is done in the context of cost shaping in
     \citet{tamar2017learning}.
-  \item \textbf{Multi-agent environments.} TODO
-  \item \textbf{Control in high-dimensional state spaces.} TODO
-  % \item Universal planning networks: \citet{srinivas2018universal}
+  \item \textbf{Multi-agent environments.}
+    In multi-agent environments, other agents can be modeled
+    as entities that are solving control optimization or
+    other learning problems.
+    This knowledge can be integrated into the learning
+    procedure as in \citet{foerster2018learning}.
+  \item \textbf{Control in high-dimensional state spaces.}
+    Control in high-dimensional state spaces such as visual
+    spaces is challenging and it is typically useful
+    to extract a lower-dimensional latent space from
+    the original feature space.
+    This is typically done by either hand-engineering
+    a feature extractor, or by learning an embedding
+    with an unsupervised learning method as in
+    \citet{watter2015embed,kurutach2018learning}.
+    Viewing controllers as differentiable entities is
+    reasonable for embedding states because the cost
+    function of the controller can be parameterized to
+    learn a cost associated with the latent representation.
   \end{itemize}
 \item \textbf{Discrete, combinatorial, and submodular optimization.}
   The space of discrete, combinatorial, and mixed optimization problems
