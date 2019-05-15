@@ -30,7 +30,8 @@
 
 % calculate skip needed to ensure that title appears in the cut-out
 \newlength{\@cutoutvskip}
-\setlength{\@cutoutvskip}{2.1875 true in}       % position of cut-out
+% \setlength{\@cutoutvskip}{2.1875 true in}       % position of cut-out
+\setlength{\@cutoutvskip}{1.5 true in}       % position of cut-out
 \addtolength{\@cutoutvskip}{-1 true in}         % printer margin
 \addtolength{\@cutoutvskip}{-\topmargin}
 \addtolength{\@cutoutvskip}{-\headheight}

@@ -9,19 +9,18 @@ We have presented the \emph{OptNet} architecture as a
 foundation for convex optimization layers and the
 \emph{input-convex neural network} architecture as a
 foundation for deep convex energy-based learning.
-We have shown how these techniques can be applied to
+We have shown how the OptNet approach can be applied to
 differentiable model-predictive control and
 top-$k$ learning.
-Differentiable optimization-based modeling components
-provide an expressive set of operations and
-have a promising set of future directions.
 To enable rapid prototyping in this space, we have shown
 how \cvxpy can be turned into a differentiable layer.
-In the following we discuss areas where optimization-based
-has been applied and has potential to continue making
-an impact.
+Differentiable optimization provides an expressive set of
+operations and have a promising set of future directions.
+In the following we provide a brief outlook of how optimization-based
+modeling benefits seven application areas,
+and we highlight a few key references in this space.
 
-\begin{itemize}
+\begin{enumerate}
 \item \textbf{Game theory.}
   The game theory literature typically focuses on finding
   optimal strategies of playing games with known rules.
@@ -34,7 +33,7 @@ an impact.
   of representing complex tasks, state spaces, and
   problems as an equilibrium-finding problem in a game
   where the rules are automatically extracted.
-  This has started to be explored in
+  This is explored in
   \citet{ling2018game}.
 \item \textbf{Stochastic optimization and end-to-end learning.}
   Typically probabilistic models are used in the context of
@@ -47,6 +46,7 @@ an impact.
   creating an end-to-end differentiable architecture is
   more difficult and can be done by using
   differentiable optimization as in \citet{donti2017task}.
+  \newpage
 \item \textbf{Reinforcement learning and control.}
   \begin{itemize}
   \item \textbf{Safety.} RL agents may be deployed in scenarios when
@@ -55,7 +55,7 @@ an impact.
     Differentiable optimization layers can be used
     to help constrain the policy class so that these
     regions are avoided.
-    This is starting to be explored in
+    This is explored in
     \citet{dalal2018safe,pham2018optlayer}.
   \item \textbf{Differentiable control and planning.}
     The differentiable MPC approach we presented in \cref{sec:empc}
@@ -103,8 +103,9 @@ an impact.
   the continuous and convex optimization problems we have considered
   in this thesis.
   Similar optimization components can be made for some of these
-  types of problems, as explored in
+  types of problems and is explored in
   \citet{djolonga2017differentiable,tschiatschek2018differentiable,mensch2018differentiable,niculae2018sparsemap,niculae2017regularized}.
+  \newpage
 \item \textbf{Meta-learning.}
   Some meta-learning formulations such as \citet{finn2017model}
   and \citet{ravi2016optimization}
@@ -114,16 +115,30 @@ an impact.
   In some cases, unrolling through a solver with
   many iterations may require inefficient amounts
   of compute or memory.
-  Meta-learning methods could be improved by using a differentiable
-  closed-form solver as
-  \citet{bertinetto2018meta} explores.
+  Meta-learning methods can be improved by using
+  differentiable closed-form solvers, as done in
+  MetaOptNet \citep{lee2019meta} with a differentiable SVM layer
+  and in \citet{bertinetto2018meta} with differentiable ridge
+  and logistic regression.
 \item \textbf{Optimization viewpoints of standard components.}
   A motivation behind this thesis work has been the optimization
   viewpoints of standard layers we discussed in \cref{sec:bg:existing}.
   Many other directions can be taken with the viewpoints, such
   as the proximal operator viewpoint in \citet{bibi2018deep}
   that interprets deep layers as stochastic solvers.
-\end{itemize}
+\item \textbf{Hyper-parameter and generalization optimization.}
+  The learning procedure for many linear machine learning models
+  can be interpreted as the solution to a convex
+  optimization problem over the loss function.
+  This convex learning process can therefore also be
+  made differentiable and used for optimizing the hyper-parameters
+  of these algorithms. This is done in
+  \citet{barratt2018optimizing} to optimize the cross-validation
+  risk of convex formulations, including logistic regression,
+  SVMs, and elastic net regression;
+  for least squares in \citet{barratt2019least};
+  and SVMs in \citet{lee2019meta}.
+\end{enumerate}
 
 %%% Local Variables:
 %%% coding: utf-8
