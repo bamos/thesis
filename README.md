@@ -138,6 +138,6 @@ The BibTeX for this document is:
   title        = {{Differentiable Optimization-Based Modeling for Machine Learning}},
   school       = {Carnegie Mellon University},
   year         = 2019,
-  month        = 5,
+  month        = May,
 }
 ```
