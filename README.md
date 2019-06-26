@@ -6,7 +6,7 @@
 + The slides are available in
   [pdf](https://github.com/bamos/thesis/raw/master/slides.pdf)
   and
-  [pptx](https://github.com/bamos/thesis/raw/master/slides.pdf)
+  [pptx](https://github.com/bamos/thesis/raw/master/slides.pptx)
   format.
 
 ---
