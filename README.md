@@ -31,7 +31,7 @@ Some of the content here is behind these publications:
 <tr>
 <td>
 <strong>Differentiable Convex Optimization Layers</strong><br />
-A. Agrawal*, <strong>B. Amos\*</strong>, S. Barratt\*, S. Boyd\*, S. Diamond\*, and J. Kolter\*<br />
+A. Agrawal*, <strong>B. Amos*</strong>, S. Barratt*, S. Boyd*, S. Diamond*, and J. Kolter*<br />
 NeurIPS 2019<br />
 [1] [<a href="http://web.stanford.edu/~boyd/papers/pdf/diff_cvxpy.pdf" target="_blank">pdf</a>]  [<a href="https://github.com/cvxgrp/cvxpylayers" target="_blank">code</a>] <br />
 </td>
